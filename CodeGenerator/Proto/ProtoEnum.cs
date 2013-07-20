@@ -31,7 +31,7 @@ namespace SilentOrbit.ProtocolBuffers
         {
             this.Name = name;
             this.Value = value;
-            this.Comment = string.Join("\r\n", comments);
+            this.Comment = string.Join("\r\n", comments.ToArray());
             comments.Clear();
         }
     }
