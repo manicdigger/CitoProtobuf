@@ -109,7 +109,9 @@ namespace SilentOrbit.ProtocolBuffers
                     {
                         cw.WriteLine("if (instance." + f.CsName + " == null)");
                         cw.WriteLine("{");
-                        cw.WriteIndent("instance." + f.CsName + " = new List<" + f.ProtoType.FullCsType + ">();");
+                        cw.WriteIndent("instance." + f.CsName + " = new " + f.ProtoType.FullCsType + "[1];");
+                        cw.WriteIndent("instance." + f.CsName + "Count = 0;");
+                        cw.WriteIndent("instance." + f.CsName + "Length = 1;");
                         cw.WriteLine("}");
                     } else if (f.OptionDefault != null)
                     {

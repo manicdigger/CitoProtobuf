@@ -119,11 +119,27 @@ namespace SilentOrbit.ProtocolBuffers
                 }
                 else
                 {
-                    s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value, int count, int length) { " + f.CsName + " = " + "value; "+f.CsName+"Count = count; "+f.CsName+"Length = length; } " + Environment.NewLine;
+                    s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value, int count, int length) { " + f.CsName + " = " + "value; " + f.CsName + "Count = count; " + f.CsName + "Length = length; } " + Environment.NewLine;
                     s += "internal int" + " " + f.CsName + "Count;" + Environment.NewLine;
                     s += f.OptionAccess + " int Get" + f.CsName + "Count() { return " + f.CsName + "Count; } " + Environment.NewLine;
                     s += "internal int" + " " + f.CsName + "Length;" + Environment.NewLine;
                     s += f.OptionAccess + " int Get" + f.CsName + "Length() { return " + f.CsName + "Length; } " + Environment.NewLine;
+                    s += f.OptionAccess + " void " + f.CsName + "Add(" + type.Replace("[]", "") + " value)";
+                    s += string.Format("{{if({0}Count >= {0}Length)\n", f.CsName);
+                    s += "{\n";
+                    s += string.Format("{0}[] {1}2 = new {0}[{1}Length*2];\n", type.Replace("[]", ""), f.CsName);
+                    s += string.Format("{0}Length = {0}Length*2;\n", f.CsName);
+
+                    s += string.Format("for(int i=0;i<{0}Count;i++)\n", f.CsName);
+                    s += "{\n";
+                    s += string.Format("{0}2[i] = {0}[i];\n", f.CsName);
+                    s += "}\n";
+                    s += string.Format("{0}={0}2;\n", f.CsName);
+
+                    s += "}\n";
+                    s += string.Format("{0}[{0}Count] = value;\n", f.CsName);
+                    s += string.Format("{0}Count++;\n", f.CsName);
+                    s += "}" + Environment.NewLine;
                 }
 
                 return s;

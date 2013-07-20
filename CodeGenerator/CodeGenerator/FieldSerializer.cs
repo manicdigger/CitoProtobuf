@@ -29,13 +29,13 @@ namespace SilentOrbit.ProtocolBuffers
                     if (f.IsUsingBinaryWriter)
                         cw.WriteLine("BinaryReader br" + f.ID + " = new BinaryReader(ms" + f.ID + ");");
                     cw.WhileBracket("ms" + f.ID + ".Position < ms" + f.ID + ".Length");
-                    cw.WriteLine("instance." + f.CsName + ".Add(" + FieldReaderType(f, "ms" + f.ID, "br" + f.ID, null) + ");");
+                    cw.WriteLine("instance." + f.CsName + "Add(" + FieldReaderType(f, "ms" + f.ID, "br" + f.ID, null) + ");");
                     cw.EndBracket();
                     cw.EndBracket();
                 } else
                 {
                     cw.Comment("repeated");
-                    cw.WriteLine("instance." + f.CsName + ".Add(" + FieldReaderType(f, "stream", "br", null) + ");");
+                    cw.WriteLine("instance." + f.CsName + "Add(" + FieldReaderType(f, "stream", "br", null) + ");");
                 }
             } else
             {   
