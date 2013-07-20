@@ -287,7 +287,10 @@ namespace SilentOrbit.ProtocolBuffers
                 {
                     //Repeated not packet
                     cw.IfBracket("instance." + f.CsName + " != null");
-                    cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
+                    //cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
+                    cw.WriteLine("for(int k=0; k < instance." + f.CsName + "Count; k++)");
+                    cw.Bracket();
+                    cw.WriteLine("var i" + f.ID + " = instance." + f.CsName + "[k];");
                     KeyWriter("stream", f.ID, f.ProtoType.WireType, cw);
                     cw.WriteLine(FieldWriterType(f, "stream", "bw", "i" + f.ID));
                     cw.EndBracket();
