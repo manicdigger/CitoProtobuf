@@ -108,7 +108,9 @@ namespace SilentOrbit.ProtocolBuffers
                     if (f.Rule == FieldRule.Repeated)
                     {
                         cw.WriteLine("if (instance." + f.CsName + " == null)");
+                        cw.WriteLine("{");
                         cw.WriteIndent("instance." + f.CsName + " = new List<" + f.ProtoType.FullCsType + ">();");
+                        cw.WriteLine("}");
                     } else if (f.OptionDefault != null)
                     {
                         if (f.ProtoType is ProtoEnum)

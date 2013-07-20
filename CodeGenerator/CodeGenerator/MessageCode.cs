@@ -103,7 +103,7 @@ namespace SilentOrbit.ProtocolBuffers
             if (f.OptionCodeType != null)
                 type = f.OptionCodeType;
             if (f.Rule == FieldRule.Repeated)
-                type = "List<" + type + ">";
+                type = type + "[]";
 
             if (f.OptionReadOnly)
                 return f.OptionAccess + " readonly " + type + " " + f.CsName + " = new " + type + "();";
@@ -113,7 +113,19 @@ namespace SilentOrbit.ProtocolBuffers
             {
                 string s = "internal " + type + " " + f.CsName + ";" + Environment.NewLine;
                 s += f.OptionAccess + " " + type + " " + "Get" + f.CsName + "() { return " + f.CsName + "; } " + Environment.NewLine;
-                s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value) { " + f.CsName + " = " + "value; } " + Environment.NewLine;
+                if (f.Rule != FieldRule.Repeated)
+                {
+                    s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value) { " + f.CsName + " = " + "value; } " + Environment.NewLine;
+                }
+                else
+                {
+                    s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value, int count, int length) { " + f.CsName + " = " + "value; "+f.CsName+"Count = count; "+f.CsName+"Length = length; } " + Environment.NewLine;
+                    s += "internal int" + " " + f.CsName + "Count;" + Environment.NewLine;
+                    s += f.OptionAccess + " int Get" + f.CsName + "Count() { return " + f.CsName + "Count; } " + Environment.NewLine;
+                    s += "internal int" + " " + f.CsName + "Length;" + Environment.NewLine;
+                    s += f.OptionAccess + " int Get" + f.CsName + "Length() { return " + f.CsName + "Length; } " + Environment.NewLine;
+                }
+
                 return s;
             }
         }
