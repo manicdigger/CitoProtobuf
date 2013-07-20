@@ -110,7 +110,12 @@ namespace SilentOrbit.ProtocolBuffers
             else if (f.ProtoType is ProtoMessage && f.ProtoType.OptionType == "struct")
                 return f.OptionAccess + " " + type + " " + f.CsName + ";";
             else
-                return f.OptionAccess + " " + type + " " + f.CsName + " { get; set; }";
+            {
+                string s = "internal " + type + " " + f.CsName + ";" + Environment.NewLine;
+                s += f.OptionAccess + " " + type + " " + "Get" + f.CsName + "() { return " + f.CsName + "; } " + Environment.NewLine;
+                s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value) { " + f.CsName + " = " + "value; } " + Environment.NewLine;
+                return s;
+            }
         }
     }
 }
