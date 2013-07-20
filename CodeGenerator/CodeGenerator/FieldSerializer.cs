@@ -311,7 +311,7 @@ namespace SilentOrbit.ProtocolBuffers
                 if (f.ProtoType is ProtoEnum)
                 {
                     if (f.OptionDefault != null)
-                        cw.IfBracket("instance." + f.CsName + " != " + f.ProtoType.CsType + "." + f.OptionDefault);
+                        cw.IfBracket("instance." + f.CsName + " != " + f.ProtoType.FullCsType + "." + f.OptionDefault);
                     KeyWriter("stream", f.ID, f.ProtoType.WireType, cw);
                     cw.WriteLine(FieldWriterType(f, "stream", "bw", "instance." + f.CsName));
                     if (f.OptionDefault != null)

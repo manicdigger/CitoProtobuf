@@ -7,16 +7,16 @@ namespace SilentOrbit.ProtocolBuffers
         public static void GenerateClass(ProtoMessage m, CodeWriter cw)
         {
             //Do not generate class code for external classes
-            if (m.OptionExternal)
+            /*if (m.OptionExternal)
             {
                 cw.Comment("Written elsewhere");
-                cw.Comment(m.OptionAccess + " " + m.OptionType + " " + m.CsType + " {}");
+                cw.Comment(m.OptionAccess + " " + m.OptionType + " " + m.CsNamespace + "_" + m.CsType + " {}");
                 return;
-            }
+            }*/
 
             //Default class
             cw.Summary(m.Comments);
-            cw.Bracket(m.OptionAccess + " partial " + m.OptionType + " " + m.CsType);
+            cw.Bracket(m.OptionAccess + " partial " + m.OptionType + " " + m.CsNamespace + "_" + m.CsType);
 
             GenerateEnums(m, cw);
 
@@ -55,7 +55,7 @@ namespace SilentOrbit.ProtocolBuffers
 
         public static void GenerateEnum(ProtoEnum me, CodeWriter cw)
         {
-            cw.Bracket("public enum " + me.CsType);
+            cw.Bracket("public enum " + me.CsNamespace + "_" + me.CsType);
             foreach (var epair in me.Enums)
             {
                 cw.Summary(epair.Comment);

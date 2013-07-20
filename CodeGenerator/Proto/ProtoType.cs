@@ -36,7 +36,7 @@ namespace SilentOrbit.ProtocolBuffers
                     if (Parent is ProtoCollection)
                         return Parent.CsNamespace;
                     else
-                        return Parent.CsNamespace + "." + Parent.CsType;
+                        return Parent.CsNamespace + "_" + Parent.CsType;
                 } else 
                     return OptionNamespace;
             }
@@ -44,7 +44,7 @@ namespace SilentOrbit.ProtocolBuffers
 
         public virtual string FullCsType
         {
-            get { return CsNamespace + "." + CsType;}
+            get { return CsNamespace + "_" + CsType;}
         }
 
         /// <summary>
@@ -55,8 +55,8 @@ namespace SilentOrbit.ProtocolBuffers
             get
             {
                 if (Parent is ProtoCollection)
-                    return Package + "." + ProtoName;
-                return Parent.FullProtoName + "." + ProtoName;
+                    return Package + "_" + ProtoName;
+                return Parent.FullProtoName + "_" + ProtoName;
             }
         }
 
@@ -115,7 +115,7 @@ namespace SilentOrbit.ProtocolBuffers
             this.OptionAccess = "public";
             this.OptionTriggers = false;
             this.OptionPreserveUnknown = false;
-            this.OptionExternal = false;
+            this.OptionExternal = true;
             this.OptionType = null;
         }
 

@@ -16,12 +16,12 @@ namespace SilentOrbit.ProtocolBuffers
             while (msg is ProtoCollection == false)
             {
                 //Search sub messages
-                pt = SearchSubMessages(msg, msg.Package + "." + msg.ProtoName + "." + path);
+                pt = SearchSubMessages(msg, msg.Package + "_" + msg.ProtoName + "_" + path);
                 if (pt != null)
                     return pt;
 
                 //Search siblings
-                pt = SearchSubMessages(msg.Parent, msg.Package + "." + path);
+                pt = SearchSubMessages(msg.Parent, msg.Package + "_" + path);
                 if (pt != null)
                     return pt;
 
@@ -39,7 +39,7 @@ namespace SilentOrbit.ProtocolBuffers
                 if (fullPath == sub.FullProtoName)
                     return sub;
 
-                if (fullPath.StartsWith(sub.FullProtoName + "."))
+                if (fullPath.StartsWith(sub.FullProtoName + "_"))
                 {
                     ProtoType pt = SearchSubMessages(sub, fullPath);
                     if (pt != null)

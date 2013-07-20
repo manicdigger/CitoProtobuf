@@ -21,9 +21,9 @@ namespace SilentOrbit.ProtocolBuffers
             get
             {
                 if (this.OptionExternal || this.OptionType == "interface")
-                    return CsType + "Serializer";
+                    return FullCsType + "Serializer";
                 else
-                    return CsType;
+                    return FullCsType;
             }
         }
 

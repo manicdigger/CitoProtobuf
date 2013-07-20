@@ -38,34 +38,34 @@ then write the code and the changes in a separate file.");
                 cw.WriteLine("using System.Collections.Generic;");
                 cw.WriteLine();
 
-                string ns = null; //avoid writing namespace between classes if they belong to the same
+                //string ns = null; //avoid writing namespace between classes if they belong to the same
                 foreach (ProtoMessage m in file.Messages.Values)
-                {
+                {/*
                     if (ns != m.CsNamespace)
                     {
                         if (ns != null) //First time
                             cw.EndBracket();
                         cw.Bracket("namespace " + m.CsNamespace);
                         ns = m.CsNamespace;
-                    }
+                    }*/
                     MessageCode.GenerateClass(m, cw);
                     cw.WriteLine();
                 }
 
                 foreach (ProtoEnum e in file.Enums.Values)
-                {
+                {/*
                     if (ns != e.CsNamespace)
                     {
                         if (ns != null) //First time
                             cw.EndBracket();
                         cw.Bracket("namespace " + e.CsNamespace);
                         ns = e.CsNamespace;
-                    }
+                    }*/
                     MessageCode.GenerateEnum(e, cw);
                     cw.WriteLine();
                 }
 
-                cw.EndBracket();
+                //cw.EndBracket();
             }
 
             //.Serializer.cs

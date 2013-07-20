@@ -180,10 +180,10 @@ namespace SilentOrbit.ProtocolBuffers
                     ParseOption(tr, m);
                     return true;
                 case "message":
-                    ParseMessage(tr, m, m.Package + "." + m.ProtoName);
+                    ParseMessage(tr, m, m.Package + "_" + m.ProtoName);
                     return true;
                 case "enum":
-                    ParseEnum(tr, m, m.Package + "." + m.ProtoName);
+                    ParseEnum(tr, m, m.Package + "_" + m.ProtoName);
                     return true;
                 case "extensions":
                     ParseExtensions(tr, m);
