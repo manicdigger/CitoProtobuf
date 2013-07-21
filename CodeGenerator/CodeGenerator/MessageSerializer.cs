@@ -10,7 +10,7 @@ namespace SilentOrbit.ProtocolBuffers
             {
                 //Don't make partial class of external classes or interfaces
                 //Make separate static class for them
-                cw.Bracket(m.OptionAccess + " static class " + m.SerializerType);
+                cw.Bracket(m.OptionAccess + " class " + m.SerializerType);
             } else
             {
                 cw.Attribute("System.Serializable()");

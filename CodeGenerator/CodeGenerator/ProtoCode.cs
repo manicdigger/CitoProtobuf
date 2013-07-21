@@ -85,19 +85,19 @@ This file will be overwritten when CodeGenerator is run.");
                 //cw.WriteLine("using System.IO;");
                 cw.WriteLine();
 
-                string ns = null; //avoid writing namespace between classes if they belong to the same
+                //string ns = null; //avoid writing namespace between classes if they belong to the same
                 foreach (ProtoMessage m in file.Messages.Values)
                 {
-                    if (ns != m.CsNamespace)
-                    {
-                        if (ns != null) //First time
-                            cw.EndBracket();
-                        cw.Bracket("namespace " + m.CsNamespace);
-                        ns = m.CsNamespace;
-                    }
+                    //if (ns != m.CsNamespace)
+                    //{
+                    //    if (ns != null) //First time
+                    //        cw.EndBracket();
+                    //    cw.Bracket("namespace " + m.CsNamespace);
+                    //    ns = m.CsNamespace;
+                    //}
                     MessageSerializer.GenerateClassSerializer(m, cw);
                 }
-                cw.EndBracket();
+                //cw.EndBracket();
             }
                 
             string libPath = Path.Combine(Path.GetDirectoryName(csPath), "ProtocolParser.cs");
