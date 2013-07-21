@@ -450,10 +450,10 @@ using System.Text;
         /// <summary>
         /// Zig-zag signed VarInt format
         /// </summary>
-        public static long ReadZInt64(Stream stream)
+        public static int ReadZInt64(Stream stream)
         {
-            ulong val = ReadUInt64(stream);
-            return (long)(val >> 1) ^ ((long)(val << 63) >> 63);
+            int val = ReadUInt64(stream);
+            return (val >> 1) ^ ((val << 63) >> 63);
         }
 
         /// <summary>
@@ -467,10 +467,10 @@ using System.Text;
         /// <summary>
         /// Unsigned VarInt format
         /// </summary>
-        public static ulong ReadUInt64(Stream stream)
+        public static int ReadUInt64(Stream stream)
         {
             int b;
-            ulong val = 0;
+            int val = 0;
 
             for (int n = 0; n < 10; n++)
             {
@@ -484,9 +484,11 @@ using System.Text;
                 //End of check
 
                 if ((b & 0x80) == 0)
-                    return val | (ulong)b << (7 * n);
+                    //return val | (ulong)b << (7 * n);
+                    return val | b << (7 * n);
 
-                val |= (ulong)(b & 0x7F) << (7 * n);
+                //val |= (ulong)(b & 0x7F) << (7 * n);
+                val |= (b & 0x7F) << (7 * n);
             }
 
             throw new InvalidDataException("Got larger VarInt than 64 bit unsigned");

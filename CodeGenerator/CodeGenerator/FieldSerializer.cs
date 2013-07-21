@@ -105,7 +105,8 @@ namespace SilentOrbit.ProtocolBuffers
 
                     default:
                     //Assume enum
-                        return "(" + f.OptionCodeType + ")" + FieldReaderPrimitive(f, stream, binaryReader, instance);
+                        return //"(" + f.OptionCodeType + ")" +
+                            FieldReaderPrimitive(f, stream, binaryReader, instance);
                 }
             }
             
@@ -124,7 +125,8 @@ namespace SilentOrbit.ProtocolBuffers
             }
 
             if (f.ProtoType is ProtoEnum)
-                return "(" + f.ProtoType.FullCsType + ")ProtocolParser.ReadUInt64(" + stream + ")";
+                return //"(" + f.ProtoType.FullCsType + ")
+                    "ProtocolParser.ReadUInt64(" + stream + ")";
             
             if (f.ProtoType is ProtoBuiltin)
             {
@@ -135,9 +137,9 @@ namespace SilentOrbit.ProtocolBuffers
                     case ProtoBuiltin.Float:
                         return binaryReader + ".ReadSingle()";
                     case ProtoBuiltin.Int32: //Wire format is 64 bit varint
-                        return "(int)ProtocolParser.ReadUInt64(" + stream + ")";
+                        return "ProtocolParser.ReadUInt64(" + stream + ")";
                     case ProtoBuiltin.Int64:
-                        return "(long)ProtocolParser.ReadUInt64(" + stream + ")";
+                        return "ProtocolParser.ReadUInt64(" + stream + ")";
                     case ProtoBuiltin.UInt32:
                         return "ProtocolParser.ReadUInt32(" + stream + ")";
                     case ProtoBuiltin.UInt64:
@@ -314,7 +316,7 @@ namespace SilentOrbit.ProtocolBuffers
                 if (f.ProtoType is ProtoEnum)
                 {
                     if (f.OptionDefault != null)
-                        cw.IfBracket("instance." + f.CsName + " != " + f.ProtoType.FullCsType + "." + f.OptionDefault);
+                        cw.IfBracket("instance." + f.CsName + " != " + f.ProtoType.FullCsType + "Enum." + f.OptionDefault);
                     KeyWriter("stream", f.ID, f.ProtoType.WireType, cw);
                     cw.WriteLine(FieldWriterType(f, "stream", "bw", "instance." + f.CsName));
                     if (f.OptionDefault != null)

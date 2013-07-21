@@ -55,11 +55,11 @@ namespace SilentOrbit.ProtocolBuffers
 
         public static void GenerateEnum(ProtoEnum me, CodeWriter cw)
         {
-            cw.Bracket("public enum " + me.CsNamespace + "_" + me.CsType);
+            cw.Bracket("public class " + me.CsNamespace + "_" + me.CsType + "Enum");
             foreach (var epair in me.Enums)
             {
                 cw.Summary(epair.Comment);
-                cw.WriteLine(epair.Name + " = " + epair.Value + ",");
+                cw.WriteLine("public const int " + epair.Name + " = " + epair.Value + ";");
             }
             cw.EndBracket();
             cw.WriteLine();
@@ -100,6 +100,10 @@ namespace SilentOrbit.ProtocolBuffers
         static string GenerateProperty(Field f)
         {
             string type = f.ProtoType.FullCsType;
+            if (f.ProtoType is ProtoEnum)
+            {
+                type = "int";
+            }
             if (f.OptionCodeType != null)
                 type = f.OptionCodeType;
             if (f.Rule == FieldRule.Repeated)

@@ -116,7 +116,7 @@ namespace SilentOrbit.ProtocolBuffers
                     } else if (f.OptionDefault != null)
                     {
                         if (f.ProtoType is ProtoEnum)
-                            cw.WriteLine("instance." + f.CsName + " = " + f.ProtoType.FullCsType + "." + f.OptionDefault + ";");
+                            cw.WriteLine("instance." + f.CsName + " = " + f.ProtoType.FullCsType + "Enum." + f.OptionDefault + ";");
                         else
                             cw.WriteLine("instance." + f.CsName + " = " + f.OptionDefault + ";");
                     } else if (f.Rule == FieldRule.Optional)
