@@ -241,9 +241,9 @@ namespace SilentOrbit.ProtocolBuffers
             */
 
             //10% faster than original using GetBuffer rather than ToArray
-            cw.WriteLine("uint " + memoryStream + "Length = (uint)" + memoryStream + ".Length();");
+            cw.WriteLine("int " + memoryStream + "Length = " + memoryStream + ".Length();");
             cw.WriteLine("ProtocolParser.WriteUInt32(" + stream + ", " + memoryStream + "Length);");
-            cw.WriteLine(stream + ".Write(" + memoryStream + ".GetBuffer(), 0, (int)" + memoryStream + "Length);");
+            cw.WriteLine(stream + ".Write(" + memoryStream + ".GetBuffer(), 0, " + memoryStream + "Length);");
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace SilentOrbit.ProtocolBuffers
                         //No memorystream buffering, write size first at once
 
                         //For constant size messages we can skip serializing to the MemoryStream
-                        cw.WriteLine("ProtocolParser.WriteUInt32(stream, " + f.ProtoType.WireSize + "u * (uint)instance." + f.CsName + ".Count);");
+                        cw.WriteLine("ProtocolParser.WriteUInt32(stream, " + f.ProtoType.WireSize + "u * instance." + f.CsName + ".Count);");
 
                         cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
                         cw.WriteLine(FieldWriterType(f, "stream", "bw", "i" + f.ID));
@@ -362,7 +362,7 @@ namespace SilentOrbit.ProtocolBuffers
         {
 
             if (f.ProtoType is ProtoEnum)
-                return "ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
+                return "ProtocolParser.WriteUInt64(" + stream + "," + instance + ");";
 
             if (f.ProtoType is ProtoMessage)
             {
@@ -385,9 +385,9 @@ namespace SilentOrbit.ProtocolBuffers
                 case ProtoBuiltin.SFixed64:
                     return binaryWriter + ".Write(" + instance + ");";
                 case ProtoBuiltin.Int32: //Serialized as 64 bit varint
-                    return "ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
+                    return "ProtocolParser.WriteUInt64(" + stream + "," + instance + ");";
                 case ProtoBuiltin.Int64:
-                    return "ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
+                    return "ProtocolParser.WriteUInt64(" + stream + "," + instance + ");";
                 case ProtoBuiltin.UInt32:
                     return "ProtocolParser.WriteUInt32(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.UInt64:

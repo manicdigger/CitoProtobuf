@@ -197,7 +197,7 @@ namespace SilentOrbit.ProtocolBuffers
                 cw.WriteLine();
 
                 cw.Comment("Reading field ID > 16 and unknown field ID/wire type combinations");
-                cw.Switch("key.Field");
+                cw.Switch("key.GetField()");
                 cw.Case(0);
                 cw.WriteLine("throw new InvalidDataException(\"Invalid field id: 0, something went wrong in the stream\");");
                 foreach (Field f in m.Fields.Values)
@@ -206,7 +206,7 @@ namespace SilentOrbit.ProtocolBuffers
                         continue;
                     cw.Case(f.ID);
                     //Makes sure we got the right wire type
-                    cw.WriteLine("if(key.WireType != Wire." + f.WireType + ")");
+                    cw.WriteLine("if(key.GetWireType() != Wire." + f.WireType + ")");
                     cw.WriteIndent("break;"); //This can be changed to throw an exception for unknown formats.
                     if (FieldSerializer.FieldReader(f, cw))
                         cw.WriteLine("continue;");
@@ -277,7 +277,7 @@ namespace SilentOrbit.ProtocolBuffers
             cw.Summary("Helper: Serialize with a varint length prefix");
             cw.Bracket(m.OptionAccess + " static void SerializeLengthDelimited(CitoStream stream, " + m.FullCsType + " instance)");
             cw.WriteLine("var data = SerializeToBytes(instance);");
-            cw.WriteLine("ProtocolParser.WriteUInt32(stream, (uint)data.Length);");
+            cw.WriteLine("ProtocolParser.WriteUInt32(stream, data.Length);");
             cw.WriteLine("stream.Write(data, 0, data.Length);");
             cw.EndBracket();
         }

@@ -20,7 +20,7 @@ public static class ProtocolParser
     public static byte[] ReadBytes(CitoStream stream)
     {
         //VarInt length
-        int length = (int)ReadUInt32(stream);
+        int length = ReadUInt32(stream);
 
         //Bytes
         byte[] buffer = new byte[length];
@@ -41,7 +41,7 @@ public static class ProtocolParser
     /// </summary>
     public static void SkipBytes(CitoStream stream)
     {
-        int length = (int)ReadUInt32(stream);
+        int length = ReadUInt32(stream);
         if (stream.CanSeek())
             stream.Seek(length, SeekOrigin.Current);
         else
@@ -58,7 +58,7 @@ public static class ProtocolParser
     /// </summary>
     public static void WriteBytes(CitoStream stream, byte[] val)
     {
-        WriteUInt32(stream, (uint)val.Length);
+        WriteUInt32(stream, val.Length);
         stream.Write(val, 0, val.Length);
     }
     //}
@@ -95,21 +95,21 @@ public static class ProtocolParser
 
     public static Key ReadKey(CitoStream stream)
     {
-        uint n = ReadUInt32(stream);
-        return Key.Create(n >> 3, (Wire)(n & 0x07));
+        int n = ReadUInt32(stream);
+        return Key.Create(n >> 3, (n & 0x07));
     }
 
     public static Key ReadKey(byte firstByte, CitoStream stream)
     {
         if (firstByte < 128)
-            return Key.Create((uint)(firstByte >> 3), (Wire)(firstByte & 0x07));
-        uint fieldID = ((uint)ReadUInt32(stream) << 4) | ((uint)(firstByte >> 3) & 0x0F);
-        return Key.Create(fieldID, (Wire)(firstByte & 0x07));
+            return Key.Create((firstByte >> 3), (firstByte & 0x07));
+        int fieldID = (ReadUInt32(stream) << 4) | ((firstByte >> 3) & 0x0F);
+        return Key.Create(fieldID, (firstByte & 0x07));
     }
 
     public static void WriteKey(CitoStream stream, Key key)
     {
-        uint n = (key.GetField() << 3) | ((uint)key.GetWireType());
+        int n = (key.GetField() << 3) | (key.GetWireType());
         WriteUInt32(stream, n);
     }
 
@@ -161,7 +161,7 @@ public static class ProtocolParser
                 return b;
             case Wire.LengthDelimited:
                 //Read and include length in value buffer
-                uint length = ProtocolParser.ReadUInt32(stream);
+                int length = ProtocolParser.ReadUInt32(stream);
                 CitoMemoryStream ms = new CitoMemoryStream();
                 {
                     //TODO: pass b directly to MemoryStream constructor or skip usage of it completely
@@ -182,7 +182,7 @@ public static class ProtocolParser
         }
     }
 
-    private static void WriteUInt32(CitoMemoryStream ms, uint length)
+    private static void WriteUInt32(CitoMemoryStream ms, int length)
     {
         throw new NotImplementedException();
     }
@@ -240,7 +240,7 @@ public static class ProtocolParser
     /// </summary>
     public static int ReadInt32(CitoStream stream)
     {
-        return (int)ReadUInt64(stream);
+        return ReadUInt64(stream);
     }
 
     [Obsolete("Use WriteUInt64(stream, (ulong)val); //yes 64, negative numbers are encoded that way")]
@@ -252,7 +252,7 @@ public static class ProtocolParser
     public static void WriteInt32(CitoStream stream, int val)
     {
         //signed varint is always encoded as 64 but values!
-        WriteUInt64(stream, (ulong)val);
+        WriteUInt64(stream, val);
     }
 
     /// <summary>
@@ -260,8 +260,8 @@ public static class ProtocolParser
     /// </summary>
     public static int ReadZInt32(CitoStream stream)
     {
-        uint val = ReadUInt32(stream);
-        return (int)(val >> 1) ^ ((int)(val << 31) >> 31);
+        int val = ReadUInt32(stream);
+        return (val >> 1) ^ ((val << 31) >> 31);
     }
 
     /// <summary>
@@ -269,17 +269,17 @@ public static class ProtocolParser
     /// </summary>
     public static void WriteZInt32(CitoStream stream, int val)
     {
-        WriteUInt32(stream, (uint)((val << 1) ^ (val >> 31)));
+        WriteUInt32(stream, ((val << 1) ^ (val >> 31)));
     }
 
     /// <summary>
     /// Unsigned VarInt format
     /// Do not use to read int32, use ReadUint64 for that.
     /// </summary>
-    public static uint ReadUInt32(CitoStream stream)
+    public static int ReadUInt32(CitoStream stream)
     {
         int b;
-        uint val = 0;
+        int val = 0;
 
         for (int n = 0; n < 5; n++)
         {
@@ -293,9 +293,9 @@ public static class ProtocolParser
             //End of check
 
             if ((b & 0x80) == 0)
-                return val | (uint)b << (7 * n);
+                return val | b << (7 * n);
 
-            val |= (uint)(b & 0x7F) << (7 * n);
+            val |= (b & 0x7F) << (7 * n);
         }
 
         throw new InvalidDataException("Got larger VarInt than 32bit unsigned");
@@ -304,7 +304,7 @@ public static class ProtocolParser
     /// <summary>
     /// Unsigned VarInt format
     /// </summary>
-    public static void WriteUInt32(CitoStream stream, uint val)
+    public static void WriteUInt32(CitoStream stream, int val)
     {
         byte[] buffer = new byte[5];
         int count = 0;
@@ -332,7 +332,7 @@ public static class ProtocolParser
     /// </summary>
     public static int ReadInt64(CitoStream stream)
     {
-        return (int)ReadUInt64(stream);
+        return ReadUInt64(stream);
     }
 
     [Obsolete("Use WriteUInt64 (stream, (ulong)val); instead")]
@@ -342,7 +342,7 @@ public static class ProtocolParser
     /// </summary>
     public static void WriteInt64(CitoStream stream, int val)
     {
-        WriteUInt64(stream, (ulong)val);
+        WriteUInt64(stream, val);
     }
 
     /// <summary>
@@ -357,9 +357,9 @@ public static class ProtocolParser
     /// <summary>
     /// Zig-zag signed VarInt format
     /// </summary>
-    public static void WriteZInt64(CitoStream stream, long val)
+    public static void WriteZInt64(CitoStream stream, int val)
     {
-        WriteUInt64(stream, (ulong)((val << 1) ^ (val >> 63)));
+        WriteUInt64(stream, ((val << 1) ^ (val >> 63)));
     }
 
     /// <summary>
@@ -395,7 +395,7 @@ public static class ProtocolParser
     /// <summary>
     /// Unsigned VarInt format
     /// </summary>
-    public static void WriteUInt64(CitoStream stream, ulong val)
+    public static void WriteUInt64(CitoStream stream, int val)
     {
         byte[] buffer = new byte[10];
         int count = 0;
@@ -436,137 +436,137 @@ public static class ProtocolParser
 }
 //}
 
-/// <summary>
-/// Wrapper for streams that does not support the Position property
-/// </summary>
-public class StreamRead : Stream
+///// <summary>
+///// Wrapper for streams that does not support the Position property
+///// </summary>
+//public class StreamRead : Stream
+//{
+//    Stream stream;
+
+//    /// <summary>
+//    /// Bytes left to read
+//    /// </summary>
+//    public int BytesRead { get; private set; }
+
+//    /// <summary>
+//    /// Define how many bytes are allowed to read
+//    /// </summary>
+//    /// <param name='baseStream'>
+//    /// Base stream.
+//    /// </param>
+//    /// <param name='maxLength'>
+//    /// Max length allowed to read from the stream.
+//    /// </param>
+//    public StreamRead(Stream baseStream)
+//    {
+//        this.stream = baseStream;
+//    }
+
+//    public override void Flush()
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public override int Read(byte[] buffer, int offset, int count)
+//    {
+//        int read = stream.Read(buffer, offset, count);
+//        BytesRead += read;
+//        return read;
+//    }
+
+//    public override int ReadByte()
+//    {
+//        int b = stream.ReadByte();
+//        BytesRead += 1;
+//        return b;
+//    }
+
+//    public override long Seek(long offset, SeekOrigin origin)
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public override void SetLength(long value)
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public override void Write(byte[] buffer, int offset, int count)
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public override bool CanRead
+//    {
+//        get
+//        {
+//            return true;
+//        }
+//    }
+
+//    public override bool CanSeek
+//    {
+//        get
+//        {
+//            return false;
+//        }
+//    }
+
+//    public override bool CanWrite
+//    {
+//        get
+//        {
+//            return false;
+//        }
+//    }
+
+//    public override long Length
+//    {
+//        get
+//        {
+//            return stream.Length;
+//        }
+//    }
+
+//    public override long Position
+//    {
+//        get
+//        {
+//            return this.BytesRead;
+//        }
+//        set
+//        {
+//            throw new NotImplementedException();
+//        }
+//    }
+//}
+
+
+public class Wire
 {
-    Stream stream;
-
-    /// <summary>
-    /// Bytes left to read
-    /// </summary>
-    public int BytesRead { get; private set; }
-
-    /// <summary>
-    /// Define how many bytes are allowed to read
-    /// </summary>
-    /// <param name='baseStream'>
-    /// Base stream.
-    /// </param>
-    /// <param name='maxLength'>
-    /// Max length allowed to read from the stream.
-    /// </param>
-    public StreamRead(Stream baseStream)
-    {
-        this.stream = baseStream;
-    }
-
-    public override void Flush()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override int Read(byte[] buffer, int offset, int count)
-    {
-        int read = stream.Read(buffer, offset, count);
-        BytesRead += read;
-        return read;
-    }
-
-    public override int ReadByte()
-    {
-        int b = stream.ReadByte();
-        BytesRead += 1;
-        return b;
-    }
-
-    public override long Seek(long offset, SeekOrigin origin)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void SetLength(long value)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void Write(byte[] buffer, int offset, int count)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override bool CanRead
-    {
-        get
-        {
-            return true;
-        }
-    }
-
-    public override bool CanSeek
-    {
-        get
-        {
-            return false;
-        }
-    }
-
-    public override bool CanWrite
-    {
-        get
-        {
-            return false;
-        }
-    }
-
-    public override long Length
-    {
-        get
-        {
-            return stream.Length;
-        }
-    }
-
-    public override long Position
-    {
-        get
-        {
-            return this.BytesRead;
-        }
-        set
-        {
-            throw new NotImplementedException();
-        }
-    }
-}
-
-
-public enum Wire
-{
-    Varint = 0,
+    public const int Varint = 0;
     //int32, int64, UInt32, UInt64, SInt32, SInt64, bool, enum
-    Fixed64 = 1,
+    public const int Fixed64 = 1;
     //fixed64, sfixed64, double
-    LengthDelimited = 2,
+    public const int LengthDelimited = 2;
     //string, bytes, embedded messages, packed repeated fields
     //Start = 3,        //  groups (deprecated)
     //End = 4,      //  groups (deprecated)
-    Fixed32 = 5,
+    public const int Fixed32 = 5;
     //32-bit    fixed32, SFixed32, float
 }
 
 public class Key
 {
-    uint Field;
-    public uint GetField() { return Field; }
-    public void SetField(uint value) { Field = value; }
+    int Field;
+    public int GetField() { return Field; }
+    public void SetField(int value) { Field = value; }
 
-    Wire WireType;
-    public Wire GetWireType() { return WireType; }
-    public void SetWireType(Wire value) { WireType = value; }
+    int WireType;
+    public int GetWireType() { return WireType; }
+    public void SetWireType(int value) { WireType = value; }
 
-    public static Key Create(uint field, Wire wireType)
+    public static Key Create(int field, int wireType)
     {
         Key k = new Key();
         k.Field = field;
@@ -612,7 +612,7 @@ public abstract class CitoStream
     public abstract void Seek(uint p, SeekOrigin seekOrigin);
     public abstract int ReadByte();
     public abstract void WriteByte(byte p);
-    public abstract long Position();
+    public abstract int Position();
 }
 
 public class CitoMemoryStream : CitoStream
@@ -720,7 +720,7 @@ public class CitoMemoryStream : CitoStream
         position++;
     }
 
-    public override long Position()
+    public override int Position()
     {
         return position;
     }
