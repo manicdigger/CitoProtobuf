@@ -60,7 +60,7 @@ namespace SilentOrbit.ProtocolBuffers
                 cw.Summary("Helper: put the buffer into a MemoryStream and create a new instance to deserializing into");
                 cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer, int length)");
                 cw.WriteLine(m.FullCsType + " instance = new " + m.FullCsType + "();");
-                cw.WriteLine("var ms = CitoMemoryStream.Create(buffer, length);");
+                cw.WriteLine("CitoMemoryStream ms = CitoMemoryStream.Create(buffer, length);");
                 cw.WriteIndent("Deserialize(ms, " + refstr + "instance);");
                 cw.WriteLine("return instance;");
                 cw.EndBracketSpace();
@@ -68,7 +68,7 @@ namespace SilentOrbit.ProtocolBuffers
 
             cw.Summary("Helper: put the buffer into a MemoryStream before deserializing");
             cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer, int length, " + refstr + m.FullCsType + " instance)");
-            cw.WriteLine("var ms = CitoMemoryStream.Create(buffer, length);");
+            cw.WriteLine("CitoMemoryStream ms = CitoMemoryStream.Create(buffer, length);");
             cw.WriteIndent("Deserialize(ms, " + refstr + "instance);");
             cw.WriteLine("return instance;");
             cw.EndBracketSpace();
@@ -196,7 +196,7 @@ namespace SilentOrbit.ProtocolBuffers
                     cw.EndBracket();
                     cw.WriteLine();
                 }
-                cw.WriteLine("var key = ProtocolParser.ReadKey((byte)keyByte, stream);");
+                cw.WriteLine("Key key = ProtocolParser.ReadKey_((byte)keyByte, stream);");
 
                 cw.WriteLine();
 
@@ -273,7 +273,7 @@ namespace SilentOrbit.ProtocolBuffers
 
             cw.Summary("Helper: Serialize into a MemoryStream and return its byte array");
             cw.Bracket(m.OptionAccess + " static byte[] SerializeToBytes(" + m.FullCsType + " instance)");
-            cw.WriteLine("var ms = new CitoMemoryStream();");
+            cw.WriteLine("CitoMemoryStream ms = new CitoMemoryStream();");
             cw.WriteLine("Serialize(ms, instance);");
             cw.WriteLine("return ms.ToArray();");
             //cw.EndBracket();
@@ -281,8 +281,8 @@ namespace SilentOrbit.ProtocolBuffers
 
             cw.Summary("Helper: Serialize with a varint length prefix");
             cw.Bracket(m.OptionAccess + " static void SerializeLengthDelimited(CitoStream stream, " + m.FullCsType + " instance)");
-            cw.WriteLine("var data = SerializeToBytes(instance);");
-            cw.WriteLine("ProtocolParser.WriteUInt32(stream, ProtoPlatform.ArrayLength(data));");
+            cw.WriteLine("byte[] data = SerializeToBytes(instance);");
+            cw.WriteLine("ProtocolParser.WriteUInt32_(stream, ProtoPlatform.ArrayLength(data));");
             cw.WriteLine("stream.Write(data, 0, ProtoPlatform.ArrayLength(data));");
             cw.EndBracket();
         }

@@ -25,7 +25,7 @@ namespace SilentOrbit.ProtocolBuffers
                 {
                     //TODO: read without buffering
                     cw.Comment("repeated packed");
-                    cw.WriteLine("var ms" + f.ID + " = new CitoMemoryStream(ProtocolParser.ReadBytes(stream));");
+                    cw.WriteLine("CitoMemoryStream ms" + f.ID + " = new CitoMemoryStream(ProtocolParser.ReadBytes(stream));");
                     if (f.IsUsingBinaryWriter)
                         cw.WriteLine("BinaryReader br" + f.ID + " = new BinaryReader(ms" + f.ID + ");");
                     cw.WhileBracket("ms" + f.ID + ".Position < ms" + f.ID + ".Length()");
@@ -242,7 +242,7 @@ namespace SilentOrbit.ProtocolBuffers
 
             //10% faster than original using GetBuffer rather than ToArray
             cw.WriteLine("int " + memoryStream + "Length = " + memoryStream + ".Length();");
-            cw.WriteLine("ProtocolParser.WriteUInt32(" + stream + ", " + memoryStream + "Length);");
+            cw.WriteLine("ProtocolParser.WriteUInt32_(" + stream + ", " + memoryStream + "Length);");
             cw.WriteLine(stream + ".Write(" + memoryStream + ".GetBuffer(), 0, " + memoryStream + "Length);");
         }
 
@@ -262,11 +262,11 @@ namespace SilentOrbit.ProtocolBuffers
                     if (f.ProtoType.WireSize < 0)
                     {
                         //Un-optimized, unknown size
-                        cw.WriteLine("var ms" + f.ID + " = new CitoMemoryStream()");
+                        cw.WriteLine("CitoMemoryStream ms" + f.ID + " = new CitoMemoryStream()");
                         if (f.IsUsingBinaryWriter)
                             cw.WriteLine("BinaryWriter bw" + f.ID + " = new BinaryWriter(ms" + f.ID + ");");
 
-                        cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
+                        cw.ForeachBracket(f.ProtoType.FullCsType + " i" + f.ID + " in instance." + f.CsName);
                         cw.WriteLine(FieldWriterType(f, "ms" + f.ID, "bw" + f.ID, "i" + f.ID));
                         //cw.EndBracket();
 
@@ -280,7 +280,7 @@ namespace SilentOrbit.ProtocolBuffers
                         //For constant size messages we can skip serializing to the MemoryStream
                         cw.WriteLine("ProtocolParser.WriteUInt32(stream, " + f.ProtoType.WireSize + "u * instance." + f.CsName + ".Count);");
 
-                        cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
+                        cw.ForeachBracket(f.ProtoType.FullCsType + " i" + f.ID + " in instance." + f.CsName);
                         cw.WriteLine(FieldWriterType(f, "stream", "bw", "i" + f.ID));
                         cw.EndBracket();
                     }
@@ -292,7 +292,7 @@ namespace SilentOrbit.ProtocolBuffers
                     //cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
                     cw.WriteLine("for(int k=0; k < instance." + f.CsName + "Count; k++)");
                     cw.Bracket();
-                    cw.WriteLine("var i" + f.ID + " = instance." + f.CsName + "[k];");
+                    cw.WriteLine(f.ProtoType.FullCsType + " i" + f.ID + " = instance." + f.CsName + "[k];");
                     KeyWriter("stream", f.ID, f.ProtoType.WireType, cw);
                     cw.WriteLine(FieldWriterType(f, "stream", "bw", "i" + f.ID));
                     cw.EndBracket();
@@ -369,7 +369,7 @@ namespace SilentOrbit.ProtocolBuffers
             {
                 ProtoMessage pm = f.ProtoType as ProtoMessage;
                 CodeWriter cw = new CodeWriter();
-                cw.WriteLine("var ms" + f.ID + " = new CitoMemoryStream();");
+                cw.WriteLine("CitoMemoryStream ms" + f.ID + " = new CitoMemoryStream();");
                 cw.WriteLine(pm.FullSerializerType + ".Serialize(ms" + f.ID + ", " + instance + ");");
                 BytesWriter(stream, "ms" + f.ID, cw);
                 //cw.EndBracket();
