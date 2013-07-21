@@ -115,7 +115,7 @@ namespace SilentOrbit.ProtocolBuffers
                 return f.OptionAccess + " " + type + " " + f.CsName + ";";
             else
             {
-                string s = "internal " + type + " " + f.CsName + ";" + Environment.NewLine;
+                string s = "#if !CITO\n internal\n#endif\n " + type + " " + f.CsName + ";" + Environment.NewLine;
                 s += f.OptionAccess + " " + type + " " + "Get" + f.CsName + "() { return " + f.CsName + "; } " + Environment.NewLine;
                 if (f.Rule != FieldRule.Repeated)
                 {
@@ -124,9 +124,9 @@ namespace SilentOrbit.ProtocolBuffers
                 else
                 {
                     s += f.OptionAccess + " void Set" + f.CsName + "(" + type + " value, int count, int length) { " + f.CsName + " = " + "value; " + f.CsName + "Count = count; " + f.CsName + "Length = length; } " + Environment.NewLine;
-                    s += "internal int" + " " + f.CsName + "Count;" + Environment.NewLine;
+                    s += "#if !CITO\n internal\n#endif\n int" + " " + f.CsName + "Count;" + Environment.NewLine;
                     s += f.OptionAccess + " int Get" + f.CsName + "Count() { return " + f.CsName + "Count; } " + Environment.NewLine;
-                    s += "internal int" + " " + f.CsName + "Length;" + Environment.NewLine;
+                    s += "#if !CITO\n internal\n#endif\n int" + " " + f.CsName + "Length;" + Environment.NewLine;
                     s += f.OptionAccess + " int Get" + f.CsName + "Length() { return " + f.CsName + "Length; } " + Environment.NewLine;
                     s += f.OptionAccess + " void " + f.CsName + "Add(" + type.Replace("[]", "") + " value)";
                     s += string.Format("{{if({0}Count >= {0}Length)\n", f.CsName);
