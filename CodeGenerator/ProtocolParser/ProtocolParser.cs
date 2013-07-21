@@ -65,8 +65,8 @@ public class ProtocolParser
     /// </summary>
     public static void WriteBytes(CitoStream stream, byte[] val)
     {
-        WriteUInt32(stream, val.Length);
-        stream.Write(val, 0, val.Length);
+        WriteUInt32(stream, ProtoPlatform.ArrayLength(val));
+        stream.Write(val, 0, ProtoPlatform.ArrayLength(val));
     }
     //}
     //}
@@ -183,8 +183,8 @@ public class ProtocolParser
                 }
 
                 //Read data into buffer
-                while (offset < b.Length)
-                    offset += stream.Read(b, offset, b.Length - offset);
+                while (offset < ProtoPlatform.ArrayLength(b))
+                    offset += stream.Read(b, offset, ProtoPlatform.ArrayLength(b) - offset);
                 return b;
             case Wire.Varint:
                 return ProtocolParser.ReadVarIntBytes(stream);
@@ -254,7 +254,7 @@ public class ProtocolParser
             offset += 1;
             if ((b & 0x80) == 0)
                 break; //end of varint
-            if (offset >= buffer.Length)
+            if (offset >= ProtoPlatform.ArrayLength(buffer))
 #if !CITO
                 throw new InvalidDataException("VarInt too long, more than 10 bytes");
 #else
@@ -841,6 +841,22 @@ public class ProtoPlatform
 #else
         string s = Encoding.UTF8.GetString(bytes);
         return s;
+#endif
+    }
+
+    public static int ArrayLength(byte[] a)
+    {
+#if CITO
+#if CS
+        native
+        {
+            return a.Length;
+        }
+#else
+        return null;
+#endif
+#else
+        return a.Length;
 #endif
     }
 }

@@ -282,8 +282,8 @@ namespace SilentOrbit.ProtocolBuffers
             cw.Summary("Helper: Serialize with a varint length prefix");
             cw.Bracket(m.OptionAccess + " static void SerializeLengthDelimited(CitoStream stream, " + m.FullCsType + " instance)");
             cw.WriteLine("var data = SerializeToBytes(instance);");
-            cw.WriteLine("ProtocolParser.WriteUInt32(stream, data.Length);");
-            cw.WriteLine("stream.Write(data, 0, data.Length);");
+            cw.WriteLine("ProtocolParser.WriteUInt32(stream, ProtoPlatform.ArrayLength(data));");
+            cw.WriteLine("stream.Write(data, 0, ProtoPlatform.ArrayLength(data));");
             cw.EndBracket();
         }
     }
