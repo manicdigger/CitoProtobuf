@@ -7,7 +7,7 @@ using System.Text;
 // 
 //namespace SilentOrbit.ProtocolBuffers
 //{
-public static class ProtocolParser
+public class ProtocolParser
 {
     public static string ReadString(CitoStream stream)
     {
