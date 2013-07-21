@@ -702,53 +702,36 @@ public class KeyValue
     }
 }
 
-public class CitoStream
+public abstract class CitoStream
 {
-    public int Read(byte[] buffer, int read, int p)
-    {
-        return 0;
-    }
-
-    public bool CanSeek()
-    {
-        return false;
-    }
-
-    public void Seek(int length, SeekOrigin seekOrigin)
-    {
-    }
-
-    public void Write(byte[] val, int p, int p_3)
-    {
-    }
-
-    public void Seek(uint p, SeekOrigin seekOrigin)
-    {
-    }
-
-    public int ReadByte()
-    {
-        return 0;
-    }
-
-    public void WriteByte(byte p)
-    {
-    }
-
-    internal long Position()
-    {
-        return 0;
-    }
+    public abstract int Read(byte[] buffer, int read, int p);
+    public abstract bool CanSeek();
+    public abstract void Seek(int length, SeekOrigin seekOrigin);
+    public abstract void Write(byte[] val, int p, int p_3);
+    public abstract void Seek(uint p, SeekOrigin seekOrigin);
+    public abstract int ReadByte();
+    public abstract void WriteByte(byte p);
+    public abstract long Position();
 }
 
 public class CitoMemoryStream : CitoStream
 {
     byte[] buffer;
-    int length;
+    int count;
+    int bufferlength;
+    int position;
+
+    public CitoMemoryStream()
+    {
+        buffer = new byte[1];
+        count = 0;
+        bufferlength = 1;
+        position = 0;
+    }
 
     public int Length()
     {
-        return length;
+        return count;
     }
 
     public byte[] ToArray()
@@ -760,12 +743,84 @@ public class CitoMemoryStream : CitoStream
     {
         CitoMemoryStream m = new CitoMemoryStream();
         m.buffer = buffer;
-        m.length = length;
+        m.count = length;
+        m.bufferlength = length;
+        m.position = 0;
         return m;
     }
 
-    internal byte[] GetBuffer()
+    public byte[] GetBuffer()
     {
         return buffer;
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (position + i >= this.count)
+            {
+                position += i;
+                return i;
+            }
+            buffer[offset + i] = this.buffer[position + i];
+        }
+        position += count;
+        return count;
+    }
+
+    public override bool CanSeek()
+    {
+        return false;
+    }
+
+    public override void Seek(int length, SeekOrigin seekOrigin)
+    {
+    }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            WriteByte(buffer[offset + i]);
+        }
+    }
+
+    public override void Seek(uint p, SeekOrigin seekOrigin)
+    {
+    }
+
+    public override int ReadByte()
+    {
+        if (position >= count)
+        {
+            return -1;
+        }
+        return buffer[position++];
+    }
+
+    public override void WriteByte(byte p)
+    {
+        if (position >= bufferlength)
+        {
+            byte[] buffer2 = new byte[bufferlength * 2];
+            for (int i = 0; i < bufferlength; i++)
+            {
+                buffer2[i] = buffer[i];
+            }
+            buffer = buffer2;
+            bufferlength = bufferlength * 2;
+        }
+        buffer[position] = p;
+        if (position == count)
+        {
+            count++;
+        }
+        position++;
+    }
+
+    public override long Position()
+    {
+        return position;
     }
 }
