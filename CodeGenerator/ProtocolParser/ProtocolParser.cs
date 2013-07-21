@@ -65,7 +65,7 @@ public class ProtocolParser
     /// </summary>
     public static void WriteBytes(CitoStream stream, byte[] val)
     {
-        WriteUInt32(stream, ProtoPlatform.ArrayLength(val));
+        WriteUInt32_(stream, ProtoPlatform.ArrayLength(val));
         stream.Write(val, 0, ProtoPlatform.ArrayLength(val));
     }
     //}
@@ -106,7 +106,7 @@ public class ProtocolParser
         return Key.Create(n >> 3, (n & 0x07));
     }
 
-    public static Key ReadKey(byte firstByte, CitoStream stream)
+    public static Key ReadKey_(byte firstByte, CitoStream stream)
     {
         if (firstByte < 128)
             return Key.Create((firstByte >> 3), (firstByte & 0x07));
@@ -117,7 +117,7 @@ public class ProtocolParser
     public static void WriteKey(CitoStream stream, Key key)
     {
         int n = (key.GetField() << 3) | (key.GetWireType());
-        WriteUInt32(stream, n);
+        WriteUInt32_(stream, n);
     }
 
     /// <summary>
@@ -305,7 +305,7 @@ public class ProtocolParser
     /// </summary>
     public static void WriteZInt32(CitoStream stream, int val)
     {
-        WriteUInt32(stream, ((val << 1) ^ (val >> 31)));
+        WriteUInt32_(stream, ((val << 1) ^ (val >> 31)));
     }
 
     /// <summary>
@@ -352,7 +352,7 @@ public class ProtocolParser
     /// <summary>
     /// Unsigned VarInt format
     /// </summary>
-    public static void WriteUInt32(CitoStream stream, int val)
+    public static void WriteUInt32_(CitoStream stream, int val)
     {
         byte[] buffer = new byte[5];
         int count = 0;
@@ -665,14 +665,14 @@ public class Key
 /// </summary>
 public class KeyValue
 {
-    Key Key;
+    Key Key_;
 
     byte[] Value;
 
     public static KeyValue Create(Key key, byte[] value)
     {
         KeyValue k = new KeyValue();
-        k.Key = key;
+        k.Key_ = key;
         k.Value = value;
         return k;
     }
@@ -689,7 +689,7 @@ public abstract class CitoStream
     public abstract bool CanSeek();
     public abstract void Seek(int length, CitoSeekOrigin seekOrigin);
     public abstract void Write(byte[] val, int p, int p_3);
-    public abstract void Seek(uint p, CitoSeekOrigin seekOrigin);
+    public abstract void Seek_(int p, CitoSeekOrigin seekOrigin);
     public abstract int ReadByte();
     public abstract void WriteByte(byte p);
     public abstract int Position();
@@ -697,56 +697,56 @@ public abstract class CitoStream
 
 public class CitoMemoryStream : CitoStream
 {
-    byte[] buffer;
-    int count;
+    byte[] buffer_;
+    int count_;
     int bufferlength;
-    int position;
+    int position_;
 
     public CitoMemoryStream()
     {
-        buffer = new byte[1];
-        count = 0;
+        buffer_ = new byte[1];
+        count_ = 0;
         bufferlength = 1;
-        position = 0;
+        position_ = 0;
     }
 
     public int Length()
     {
-        return count;
+        return count_;
     }
 
     public byte[] ToArray()
     {
-        return buffer;
+        return buffer_;
     }
 
     public static CitoMemoryStream Create(byte[] buffer, int length)
     {
         CitoMemoryStream m = new CitoMemoryStream();
-        m.buffer = buffer;
-        m.count = length;
+        m.buffer_ = buffer;
+        m.count_ = length;
         m.bufferlength = length;
-        m.position = 0;
+        m.position_ = 0;
         return m;
     }
 
     public byte[] GetBuffer()
     {
-        return buffer;
+        return buffer_;
     }
 
     public override int Read(byte[] buffer, int offset, int count)
     {
         for (int i = 0; i < count; i++)
         {
-            if (position + i >= this.count)
+            if (position_ + i >= this.count_)
             {
-                position += i;
+                position_ += i;
                 return i;
             }
-            buffer[offset + i] = this.buffer[position + i];
+            buffer[offset + i] = this.buffer_[position_ + i];
         }
-        position += count;
+        position_ += count;
         return count;
     }
 
@@ -767,42 +767,42 @@ public class CitoMemoryStream : CitoStream
         }
     }
 
-    public override void Seek(uint p, CitoSeekOrigin seekOrigin)
+    public override void Seek_(int p, CitoSeekOrigin seekOrigin)
     {
     }
 
     public override int ReadByte()
     {
-        if (position >= count)
+        if (position_ >= count_)
         {
             return -1;
         }
-        return buffer[position++];
+        return buffer_[position_++];
     }
 
     public override void WriteByte(byte p)
     {
-        if (position >= bufferlength)
+        if (position_ >= bufferlength)
         {
             byte[] buffer2 = new byte[bufferlength * 2];
             for (int i = 0; i < bufferlength; i++)
             {
-                buffer2[i] = buffer[i];
+                buffer2[i] = buffer_[i];
             }
-            buffer = buffer2;
+            buffer_ = buffer2;
             bufferlength = bufferlength * 2;
         }
-        buffer[position] = p;
-        if (position == count)
+        buffer_[position_] = p;
+        if (position_ == count_)
         {
-            count++;
+            count_++;
         }
-        position++;
+        position_++;
     }
 
     public override int Position()
     {
-        return position;
+        return position_;
     }
 }
 
@@ -853,7 +853,7 @@ public class ProtoPlatform
             return a.Length;
         }
 #else
-        return null;
+        return 0;
 #endif
 #else
         return a.Length;
