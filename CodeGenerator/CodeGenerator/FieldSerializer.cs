@@ -209,12 +209,16 @@ namespace SilentOrbit.ProtocolBuffers
                 return;
             }
 
-            string line = stream + ".Write(new byte[]{";
             foreach (byte v in bytes)
-                line += v + ", ";
-            line = line.TrimEnd(new char[] { ' ', ',' });
-            line += "}, 0, " + bytes.Count + ");";
-            cw.WriteLine(line);
+            {
+                cw.WriteLine(stream + ".WriteByte(" + v + ");");
+            }
+            //string line = stream + ".Write(new byte[]{";
+            //foreach (byte v in bytes)
+            //    line += v + ", ";
+            //line = line.TrimEnd(new char[] { ' ', ',' });
+            //line += "}, 0, " + bytes.Count + ");";
+            //cw.WriteLine(line);
         }
 
         /// <summary>
