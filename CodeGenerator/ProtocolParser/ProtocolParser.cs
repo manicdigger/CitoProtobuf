@@ -11,7 +11,8 @@ public static class ProtocolParser
 {
     public static string ReadString(CitoStream stream)
     {
-        return Encoding.UTF8.GetString(ReadBytes(stream));
+        byte[] bytes = ReadBytes(stream);
+        return ProtoPlatform.BytesToString(bytes, 0);
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public static class ProtocolParser
 
     public static void WriteString(CitoStream stream, string val)
     {
-        WriteBytes(stream, Encoding.UTF8.GetBytes(val));
+        WriteBytes(stream, ProtoPlatform.StringToBytes(val));
     }
 
     /// <summary>
@@ -723,5 +724,44 @@ public class CitoMemoryStream : CitoStream
     public override int Position()
     {
         return position;
+    }
+}
+
+public class ProtoPlatform
+{
+    public static byte[] StringToBytes(string s)
+    {
+#if CITO
+#if CS
+        native
+        {
+            byte[] b = Encoding.UTF8.GetBytes(s);
+            return b;
+        }
+#else
+        return null;
+#endif
+#else
+        byte[] b = Encoding.UTF8.GetBytes(s);
+        return b;
+
+#endif
+    }
+    public static string BytesToString(byte[] bytes, int length)
+    {
+#if CITO
+#if CS
+        native
+        {
+            string s = Encoding.UTF8.GetString(bytes);
+            return s;
+        }
+#else
+        return null;
+#endif
+#else
+        string s = Encoding.UTF8.GetString(bytes);
+        return s;
+#endif
     }
 }
