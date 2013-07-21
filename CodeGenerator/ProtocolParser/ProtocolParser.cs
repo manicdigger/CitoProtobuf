@@ -757,4 +757,9 @@ public class CitoMemoryStream : CitoStream
     {
         return null;
     }
+
+    internal byte[] GetBuffer()
+    {
+        return null;
+    }
 }
