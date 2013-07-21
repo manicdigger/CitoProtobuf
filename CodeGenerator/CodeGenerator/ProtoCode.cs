@@ -108,6 +108,11 @@ This file will be overwritten when CodeGenerator is run.");
                 ReadCode(codeWriter, "ProtocolParserKey", false);
                 ReadCode(codeWriter, "ProtocolParserVarInt", false);
             }
+
+            string output1 = File.ReadAllText(csPath);
+            string output2 = File.ReadAllText(prefix + ".Serializer" + ext);
+            string output3 = File.ReadAllText(libPath);
+            File.WriteAllText(prefix + ".Serializer" + ".ci.cs", output1 + output2 + output3);
         }
 
         /// <summary>
