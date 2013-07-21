@@ -35,21 +35,21 @@ namespace SilentOrbit.ProtocolBuffers
             #region Helper Deserialize Methods
             string refstr = (m.OptionType == "struct") ? "ref " : "";
             if (m.OptionType != "interface")
-            {
+            {/*
                 cw.Summary("Helper: create a new instance to deserializing into");
                 cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(CitoStream stream)");
                 cw.WriteLine(m.FullCsType + " instance = new " + m.FullCsType + "();");
                 cw.WriteLine("Deserialize(stream, " + refstr + "instance);");
                 cw.WriteLine("return instance;");
                 cw.EndBracketSpace();
-                
+                */
                 cw.Summary("Helper: create a new instance to deserializing into");
-                cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " DeserializeLengthDelimited(CitoStream stream)");
+                cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " DeserializeLengthDelimitedNew(CitoStream stream)");
                 cw.WriteLine(m.FullCsType + " instance = new " + m.FullCsType + "();");
                 cw.WriteLine("DeserializeLengthDelimited(stream, " + refstr + "instance);");
                 cw.WriteLine("return instance;");
                 cw.EndBracketSpace();
-                
+                /*
                 cw.Summary("Helper: create a new instance to deserializing into");
                 cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " DeserializeLength(CitoStream stream, int length)");
                 cw.WriteLine(m.FullCsType + " instance = new " + m.FullCsType + "();");
@@ -63,11 +63,11 @@ namespace SilentOrbit.ProtocolBuffers
                 cw.WriteLine("CitoMemoryStream ms = CitoMemoryStream.Create(buffer, length);");
                 cw.WriteIndent("Deserialize(ms, " + refstr + "instance);");
                 cw.WriteLine("return instance;");
-                cw.EndBracketSpace();
+                cw.EndBracketSpace();*/
             }
 
             cw.Summary("Helper: put the buffer into a MemoryStream before deserializing");
-            cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer, int length, " + refstr + m.FullCsType + " instance)");
+            cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " DeserializeBuffer(byte[] buffer, int length, " + refstr + m.FullCsType + " instance)");
             cw.WriteLine("CitoMemoryStream ms = CitoMemoryStream.Create(buffer, length);");
             cw.WriteIndent("Deserialize(ms, " + refstr + "instance);");
             cw.WriteLine("return instance;");
@@ -137,13 +137,13 @@ namespace SilentOrbit.ProtocolBuffers
                 if (method == "DeserializeLengthDelimited")
                 {
                     //Important to read stream position after we have read the length field
-                    cw.WriteLine("long limit = ProtocolParser.ReadUInt32(stream);");
+                    cw.WriteLine("int limit = ProtocolParser.ReadUInt32(stream);");
                     cw.WriteLine("limit += stream.Position();");
                 }
                 if (method == "DeserializeLength")
                 {
                     //Important to read stream position after we have read the length field
-                    cw.WriteLine("long limit = stream.Position() + length;");
+                    cw.WriteLine("int limit = stream.Position() + length;");
                 }
 
                 cw.WhileBracket("true");
@@ -193,10 +193,12 @@ namespace SilentOrbit.ProtocolBuffers
                         if (FieldSerializer.FieldReader(f, cw))
                             cw.WriteLine("continue;");
                     }
+                    cw.WriteLine("default: break;");
                     cw.EndBracket();
                     cw.WriteLine();
                 }
-                cw.WriteLine("Key key = ProtocolParser.ReadKey_((byte)keyByte, stream);");
+                cw.WriteLine("#if CITO\n Key key = ProtocolParser.ReadKey_(keyByte.LowByte, stream);");
+                cw.WriteLine("#else\n Key key = ProtocolParser.ReadKey_((byte)keyByte, stream);\n#endif");
 
                 cw.WriteLine();
 

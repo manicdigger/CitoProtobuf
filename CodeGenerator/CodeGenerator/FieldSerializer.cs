@@ -119,7 +119,7 @@ namespace SilentOrbit.ProtocolBuffers
             {
                 var m = f.ProtoType as ProtoMessage;
                 if (f.Rule == FieldRule.Repeated || instance == null)
-                    return m.FullSerializerType + ".DeserializeLengthDelimited(" + stream + ")";
+                    return m.FullSerializerType + ".DeserializeLengthDelimitedNew(" + stream + ")";
                 else
                     return m.FullSerializerType + ".DeserializeLengthDelimited(" + stream + ", " + instance + ")";
             }
@@ -369,7 +369,7 @@ namespace SilentOrbit.ProtocolBuffers
             {
                 ProtoMessage pm = f.ProtoType as ProtoMessage;
                 CodeWriter cw = new CodeWriter();
-                cw.WriteLine("CitoMemoryStream ms" + f.ID + " = new CitoMemoryStream();");
+                cw.WriteLine(" CitoMemoryStream ms" + f.ID + " = new CitoMemoryStream();");
                 cw.WriteLine(pm.FullSerializerType + ".Serialize(ms" + f.ID + ", " + instance + ");");
                 BytesWriter(stream, "ms" + f.ID, cw);
                 //cw.EndBracket();
