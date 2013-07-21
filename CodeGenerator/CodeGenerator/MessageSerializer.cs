@@ -154,7 +154,8 @@ namespace SilentOrbit.ProtocolBuffers
                     cw.WriteLine("if(stream.Position() == limit)");
                     cw.WriteIndent("break;");
                     cw.WriteLine("else");
-                    cw.WriteIndent("throw new InvalidOperationException(\"Read past max limit\");");
+                    cw.WriteIndent("//throw new InvalidOperationException(\"Read past max limit\");");
+                    cw.WriteIndent("return null;");
                     cw.EndBracket();
                 }
 
@@ -163,7 +164,10 @@ namespace SilentOrbit.ProtocolBuffers
                 if (method == "Deserialize")
                     cw.WriteIndent("break;");
                 else
-                    cw.WriteIndent("throw new System.IO.EndOfStreamException();");
+                {
+                    cw.WriteIndent("//throw new System.IO.EndOfStreamException();");
+                    cw.WriteIndent("return null;");
+                }
 
                 //Determine if we need the lowID optimization
                 bool hasLowID = false;
@@ -199,7 +203,8 @@ namespace SilentOrbit.ProtocolBuffers
                 cw.Comment("Reading field ID > 16 and unknown field ID/wire type combinations");
                 cw.Switch("key.GetField()");
                 cw.Case(0);
-                cw.WriteLine("throw new InvalidDataException(\"Invalid field id: 0, something went wrong in the stream\");");
+                cw.WriteLine("//throw new InvalidDataException(\"Invalid field id: 0, something went wrong in the stream\");");
+                cw.WriteLine("return null;");
                 foreach (Field f in m.Fields.Values)
                 {
                     if (f.ID < 16)

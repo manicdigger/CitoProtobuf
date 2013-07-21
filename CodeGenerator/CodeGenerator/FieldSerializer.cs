@@ -333,7 +333,8 @@ namespace SilentOrbit.ProtocolBuffers
                     f.ProtoType.ProtoName == ProtoBuiltin.Bytes)
                 {
                     cw.WriteLine("if (instance." + f.CsName + " == null)");
-                    cw.WriteIndent("throw new ArgumentNullException(\"" + f.CsName + "\", \"Required by proto specification.\");");
+                    cw.WriteIndent("//throw new ArgumentNullException(\"" + f.CsName + "\", \"Required by proto specification.\");");
+                    cw.WriteIndent("return;");
                 }
                 KeyWriter("stream", f.ID, f.ProtoType.WireType, cw);
                 cw.WriteLine(FieldWriterType(f, "stream", "bw", "instance." + f.CsName));
