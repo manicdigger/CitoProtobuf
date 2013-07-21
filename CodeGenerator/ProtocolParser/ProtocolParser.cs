@@ -230,7 +230,10 @@ public static class ProtocolParser
                 throw new InvalidDataException("VarInt too long, more than 10 bytes");
         }
         byte[] ret = new byte[offset];
-        Array.Copy(buffer, ret, ret.Length);
+        for (int i = 0; i < offset; i++)
+        {
+            ret[i] = buffer[i];
+        }
         return ret;
     }
     //#region VarInt: int32, uint32, sint32
