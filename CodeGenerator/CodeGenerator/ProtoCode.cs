@@ -34,8 +34,8 @@ This file will be overwritten when CodeGenerator is run.
 To make custom modifications, edit the .proto file and add //:external before the message line
 then write the code and the changes in a separate file.");
 
-                cw.WriteLine("using System;");
-                cw.WriteLine("using System.Collections.Generic;");
+                //cw.WriteLine("using System;");
+                //cw.WriteLine("using System.Collections.Generic;");
                 cw.WriteLine();
 
                 //string ns = null; //avoid writing namespace between classes if they belong to the same
