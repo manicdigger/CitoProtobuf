@@ -197,7 +197,7 @@ public class ProtocolParser
         }
     }
 
-    private static void WriteUInt32(CitoMemoryStream ms, int length)
+    static void WriteUInt32(CitoMemoryStream ms, int length)
     {
 #if !CITO
         throw new NotImplementedException();
@@ -246,7 +246,11 @@ public class ProtocolParser
 #else
                 return null;
 #endif
+#if !CITO
             buffer[offset] = (byte)b;
+#else
+            buffer[offset] = b.LowByte;
+#endif
             offset += 1;
             if ((b & 0x80) == 0)
                 break; //end of varint
@@ -355,7 +359,11 @@ public class ProtocolParser
 
         while (true)
         {
+#if !CITO
             buffer[count] = (byte)(val & 0x7F);
+#else
+            buffer[count] = (val & 0x7F).LowByte;
+#endif
             val = val >> 7;
             if (val == 0)
                 break;
@@ -457,7 +465,11 @@ public class ProtocolParser
 
         while (true)
         {
+#if !CITO
             buffer[count] = (byte)(val & 0x7F);
+#else
+            buffer[count] = (val & 0x7F).LowByte;
+#endif
             val = val >> 7;
             if (val == 0)
                 break;
@@ -493,7 +505,12 @@ public class ProtocolParser
 
     public static void WriteBool(CitoStream stream, bool val)
     {
-        stream.WriteByte(val ? (byte)1 : (byte)0);
+        byte ret = 0;
+        if (val)
+        {
+            ret = 1;
+        }
+        stream.WriteByte(ret);
     }
     //#endregion
 }
