@@ -178,7 +178,11 @@ public class ProtocolParser
                     //TODO: pass b directly to MemoryStream constructor or skip usage of it completely
                     ProtocolParser.WriteUInt32(ms, length);
                     b = new byte[length + ms.Length()];
-                    ms.ToArray().CopyTo(b, 0);
+                    byte[] arr = ms.ToArray();
+                    for (int i = 0; i < ProtoPlatform.ArrayLength(arr); i++)
+                    {
+                        b[i] = arr[i];
+                    }
                     offset = ms.Length();
                 }
 
