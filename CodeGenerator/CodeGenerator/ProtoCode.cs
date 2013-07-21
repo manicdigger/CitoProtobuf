@@ -117,7 +117,7 @@ This file will be overwritten when CodeGenerator is run.");
         /// </summary>
         private static void ReadCode(TextWriter code, string name, bool includeUsing)
         {
-            code.WriteLine("#region " + name);
+            //code.WriteLine("#region " + name);
             
             using (TextReader tr = new StreamReader(Assembly.GetExecutingAssembly ().GetManifestResourceStream (name), Encoding.UTF8))
             {
@@ -134,7 +134,7 @@ This file will be overwritten when CodeGenerator is run.");
                     code.Write(line + "\r\n");
                 }
             }
-            code.WriteLine("#endregion");
+            //code.WriteLine("#endregion");
         }
     }
 }
