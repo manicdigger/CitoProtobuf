@@ -58,17 +58,17 @@ namespace SilentOrbit.ProtocolBuffers
                 cw.EndBracketSpace();
                 
                 cw.Summary("Helper: put the buffer into a MemoryStream and create a new instance to deserializing into");
-                cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer)");
+                cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer, int length)");
                 cw.WriteLine(m.FullCsType + " instance = new " + m.FullCsType + "();");
-                cw.WriteLine("var ms = CitoMemoryStream.Create(buffer);");
+                cw.WriteLine("var ms = CitoMemoryStream.Create(buffer, length);");
                 cw.WriteIndent("Deserialize(ms, " + refstr + "instance);");
                 cw.WriteLine("return instance;");
                 cw.EndBracketSpace();
             }
 
             cw.Summary("Helper: put the buffer into a MemoryStream before deserializing");
-            cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer, " + refstr + m.FullCsType + " instance)");
-            cw.WriteLine("var ms = CitoMemoryStream.Create(buffer);");
+            cw.Bracket(m.OptionAccess + " static " + m.FullCsType + " Deserialize(byte[] buffer, int length, " + refstr + m.FullCsType + " instance)");
+            cw.WriteLine("var ms = CitoMemoryStream.Create(buffer, length);");
             cw.WriteIndent("Deserialize(ms, " + refstr + "instance);");
             cw.WriteLine("return instance;");
             cw.EndBracketSpace();

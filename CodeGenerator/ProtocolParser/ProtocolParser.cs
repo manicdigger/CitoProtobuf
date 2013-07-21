@@ -743,23 +743,29 @@ public class CitoStream
 
 public class CitoMemoryStream : CitoStream
 {
+    byte[] buffer;
+    int length;
+
     public int Length()
     {
-        return 0;
+        return length;
     }
 
     public byte[] ToArray()
     {
-        return null;
+        return buffer;
     }
 
-    public static CitoMemoryStream Create(byte[] buffer)
+    public static CitoMemoryStream Create(byte[] buffer, int length)
     {
-        return null;
+        CitoMemoryStream m = new CitoMemoryStream();
+        m.buffer = buffer;
+        m.length = length;
+        return m;
     }
 
     internal byte[] GetBuffer()
     {
-        return null;
+        return buffer;
     }
 }
