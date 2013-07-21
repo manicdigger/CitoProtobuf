@@ -96,20 +96,20 @@ public static class ProtocolParser
     public static Key ReadKey(CitoStream stream)
     {
         uint n = ReadUInt32(stream);
-        return new Key(n >> 3, (Wire)(n & 0x07));
+        return Key.Create(n >> 3, (Wire)(n & 0x07));
     }
 
     public static Key ReadKey(byte firstByte, CitoStream stream)
     {
         if (firstByte < 128)
-            return new Key((uint)(firstByte >> 3), (Wire)(firstByte & 0x07));
+            return Key.Create((uint)(firstByte >> 3), (Wire)(firstByte & 0x07));
         uint fieldID = ((uint)ReadUInt32(stream) << 4) | ((uint)(firstByte >> 3) & 0x0F);
-        return new Key(fieldID, (Wire)(firstByte & 0x07));
+        return Key.Create(fieldID, (Wire)(firstByte & 0x07));
     }
 
     public static void WriteKey(CitoStream stream, Key key)
     {
-        uint n = (key.Field << 3) | ((uint)key.WireType);
+        uint n = (key.GetField() << 3) | ((uint)key.GetWireType());
         WriteUInt32(stream, n);
     }
 
@@ -118,7 +118,7 @@ public static class ProtocolParser
     /// </summary>
     public static void SkipKey(CitoStream stream, Key key)
     {
-        switch (key.WireType)
+        switch (key.GetWireType())
         {
             case Wire.Fixed32:
                 stream.Seek(4, SeekOrigin.Current);
@@ -133,7 +133,7 @@ public static class ProtocolParser
                 ProtocolParser.ReadSkipVarInt(stream);
                 return;
             default:
-                throw new NotImplementedException("Unknown wire type: " + key.WireType);
+                throw new NotImplementedException("Unknown wire type: " + key.GetWireType());
         }
     }
 
@@ -147,7 +147,7 @@ public static class ProtocolParser
         byte[] b;
         int offset = 0;
 
-        switch (key.WireType)
+        switch (key.GetWireType())
         {
             case Wire.Fixed32:
                 b = new byte[4];
@@ -178,7 +178,7 @@ public static class ProtocolParser
             case Wire.Varint:
                 return ProtocolParser.ReadVarIntBytes(stream);
             default:
-                throw new NotImplementedException("Unknown wire type: " + key.WireType);
+                throw new NotImplementedException("Unknown wire type: " + key.GetWireType());
         }
     }
 
@@ -558,20 +558,26 @@ public enum Wire
 
 public class Key
 {
-    public uint Field { get; set; }
+    uint Field;
+    public uint GetField() { return Field; }
+    public void SetField(uint value) { Field = value; }
 
-    public Wire WireType { get; set; }
+    Wire WireType;
+    public Wire GetWireType() { return WireType; }
+    public void SetWireType(Wire value) { WireType = value; }
 
-    public Key(uint field, Wire wireType)
+    public static Key Create(uint field, Wire wireType)
     {
-        this.Field = field;
-        this.WireType = wireType;
+        Key k = new Key();
+        k.Field = field;
+        k.WireType = wireType;
+        return k;
     }
 
-    public override string ToString()
-    {
-        return string.Format("[Key: {0}, {1}]", Field, WireType);
-    }
+    //public override string ToString()
+    //{
+    //    return string.Format("[Key: {0}, {1}]", Field, WireType);
+    //}
 }
 
 /// <summary>
@@ -579,20 +585,22 @@ public class Key
 /// </summary>
 public class KeyValue
 {
-    public Key Key { get; set; }
+    Key Key;
 
-    public byte[] Value { get; set; }
+    byte[] Value;
 
-    public KeyValue(Key key, byte[] value)
+    public static KeyValue Create(Key key, byte[] value)
     {
-        this.Key = key;
-        this.Value = value;
+        KeyValue k = new KeyValue();
+        k.Key = key;
+        k.Value = value;
+        return k;
     }
 
-    public override string ToString()
-    {
-        return string.Format("[KeyValue: {0}, {1}, {2} bytes]", Key.Field, Key.WireType, Value.Length);
-    }
+    //public override string ToString()
+    //{
+    //    return string.Format("[KeyValue: {0}, {1}, {2} bytes]", Key.Field, Key.WireType, Value.Length);
+    //}
 }
 
 public abstract class CitoStream
