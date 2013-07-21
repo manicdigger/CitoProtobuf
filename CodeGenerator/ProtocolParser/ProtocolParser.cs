@@ -30,7 +30,11 @@ public static class ProtocolParser
         {
             int r = stream.Read(buffer, read, length - read);
             if (r == 0)
+#if !CITO
                 throw new InvalidDataException("Expected " + (length - read) + " got " + read);
+#else
+            return null;
+#endif
             read += r;
         }
         return buffer;
@@ -134,7 +138,11 @@ public static class ProtocolParser
                 ProtocolParser.ReadSkipVarInt(stream);
                 return;
             default:
+#if !CITO
                 throw new NotImplementedException("Unknown wire type: " + key.GetWireType());
+#else
+                return;
+#endif
         }
     }
 
@@ -179,13 +187,19 @@ public static class ProtocolParser
             case Wire.Varint:
                 return ProtocolParser.ReadVarIntBytes(stream);
             default:
+#if !CITO
                 throw new NotImplementedException("Unknown wire type: " + key.GetWireType());
+#else
+                return null;
+#endif
         }
     }
 
     private static void WriteUInt32(CitoMemoryStream ms, int length)
     {
+#if !CITO
         throw new NotImplementedException();
+#endif
     }
     //}
     //}
@@ -206,7 +220,11 @@ public static class ProtocolParser
         {
             int b = stream.ReadByte();
             if (b < 0)
+#if !CITO
                 throw new IOException("Stream ended too early");
+#else
+                return;
+#endif
 
             if ((b & 0x80) == 0)
                 return; //end of varint
@@ -221,13 +239,21 @@ public static class ProtocolParser
         {
             int b = stream.ReadByte();
             if (b < 0)
+#if !CITO
                 throw new IOException("Stream ended too early");
+#else
+                return null;
+#endif
             buffer[offset] = (byte)b;
             offset += 1;
             if ((b & 0x80) == 0)
                 break; //end of varint
             if (offset >= buffer.Length)
+#if !CITO
                 throw new InvalidDataException("VarInt too long, more than 10 bytes");
+#else
+                return null;
+#endif
         }
         byte[] ret = new byte[offset];
         for (int i = 0; i < offset; i++)
@@ -289,11 +315,19 @@ public static class ProtocolParser
         {
             b = stream.ReadByte();
             if (b < 0)
+#if !CITO
                 throw new IOException("Stream ended too early");
+#else
+                return 0;
+#endif
 
             //Check that it fits in 32 bits
             if ((n == 4) && (b & 0xF0) != 0)
+#if !CITO
                 throw new InvalidDataException("Got larger VarInt than 32bit unsigned");
+#else
+                return 0;
+#endif
             //End of check
 
             if ((b & 0x80) == 0)
@@ -302,7 +336,11 @@ public static class ProtocolParser
             val |= (b & 0x7F) << (7 * n);
         }
 
+#if !CITO
         throw new InvalidDataException("Got larger VarInt than 32bit unsigned");
+#else
+        return 0;
+#endif
     }
 
     /// <summary>
@@ -378,11 +416,19 @@ public static class ProtocolParser
         {
             b = stream.ReadByte();
             if (b < 0)
+#if !CITO
                 throw new IOException("Stream ended too early");
+#else
+                return 0;
+#endif
 
             //Check that it fits in 64 bits
             if ((n == 9) && (b & 0xFE) != 0)
+#if !CITO
                 throw new InvalidDataException("Got larger VarInt than 64 bit unsigned");
+#else
+                return 0;
+#endif
             //End of check
 
             if ((b & 0x80) == 0)
@@ -392,8 +438,11 @@ public static class ProtocolParser
             //val |= (ulong)(b & 0x7F) << (7 * n);
             val |= (b & 0x7F) << (7 * n);
         }
-
+#if !CITO
         throw new InvalidDataException("Got larger VarInt than 64 bit unsigned");
+#else
+        return 0;
+#endif
     }
 
     /// <summary>
@@ -424,12 +473,20 @@ public static class ProtocolParser
     {
         int b = stream.ReadByte();
         if (b < 0)
+#if !CITO
             throw new IOException("Stream ended too early");
+#else
+            return false;
+#endif
         if (b == 1)
             return true;
         if (b == 0)
             return false;
+#if !CITO
         throw new InvalidDataException("Invalid boolean value");
+#else
+        return false;
+#endif
     }
 
     public static void WriteBool(CitoStream stream, bool val)
