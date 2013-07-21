@@ -1,6 +1,8 @@
+#if !CITO
 using System;
 using System.IO;
 using System.Text;
+#endif
 
 // 
 //  Read/Write string and byte arrays 
@@ -48,7 +50,7 @@ public class ProtocolParser
     {
         int length = ReadUInt32(stream);
         if (stream.CanSeek())
-            stream.Seek(length, SeekOrigin.Current);
+            stream.Seek(length, CitoSeekOrigin.Current);
         else
             ReadBytes(stream);
     }
@@ -126,13 +128,13 @@ public class ProtocolParser
         switch (key.GetWireType())
         {
             case Wire.Fixed32:
-                stream.Seek(4, SeekOrigin.Current);
+                stream.Seek(4, CitoSeekOrigin.Current);
                 return;
             case Wire.Fixed64:
-                stream.Seek(8, SeekOrigin.Current);
+                stream.Seek(8, CitoSeekOrigin.Current);
                 return;
             case Wire.LengthDelimited:
-                stream.Seek(ProtocolParser.ReadUInt32(stream), SeekOrigin.Current);
+                stream.Seek(ProtocolParser.ReadUInt32(stream), CitoSeekOrigin.Current);
                 return;
             case Wire.Varint:
                 ProtocolParser.ReadSkipVarInt(stream);
@@ -668,9 +670,9 @@ public abstract class CitoStream
 {
     public abstract int Read(byte[] buffer, int read, int p);
     public abstract bool CanSeek();
-    public abstract void Seek(int length, SeekOrigin seekOrigin);
+    public abstract void Seek(int length, CitoSeekOrigin seekOrigin);
     public abstract void Write(byte[] val, int p, int p_3);
-    public abstract void Seek(uint p, SeekOrigin seekOrigin);
+    public abstract void Seek(uint p, CitoSeekOrigin seekOrigin);
     public abstract int ReadByte();
     public abstract void WriteByte(byte p);
     public abstract int Position();
@@ -736,7 +738,7 @@ public class CitoMemoryStream : CitoStream
         return false;
     }
 
-    public override void Seek(int length, SeekOrigin seekOrigin)
+    public override void Seek(int length, CitoSeekOrigin seekOrigin)
     {
     }
 
@@ -748,7 +750,7 @@ public class CitoMemoryStream : CitoStream
         }
     }
 
-    public override void Seek(uint p, SeekOrigin seekOrigin)
+    public override void Seek(uint p, CitoSeekOrigin seekOrigin)
     {
     }
 
@@ -824,4 +826,9 @@ public class ProtoPlatform
         return s;
 #endif
     }
+}
+
+public enum CitoSeekOrigin
+{
+    Current
 }

@@ -81,8 +81,8 @@ Report bugs to: https://silentorbit.com/protobuf/");
                 cw.Comment(@"DO NOT EDIT
 This file will be overwritten when CodeGenerator is run.");
 
-                cw.WriteLine("using System;");
-                cw.WriteLine("using System.IO;");
+                //cw.WriteLine("using System;");
+                //cw.WriteLine("using System.IO;");
                 cw.WriteLine();
 
                 string ns = null; //avoid writing namespace between classes if they belong to the same
