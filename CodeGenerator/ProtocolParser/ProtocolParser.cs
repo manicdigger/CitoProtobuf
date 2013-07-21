@@ -9,7 +9,7 @@ using System.Text;
 //{
 public static class ProtocolParser
 {
-    public static string ReadString(Stream stream)
+    public static string ReadString(CitoStream stream)
     {
         return Encoding.UTF8.GetString(ReadBytes(stream));
     }
@@ -17,7 +17,7 @@ public static class ProtocolParser
     /// <summary>
     /// Reads a length delimited byte array
     /// </summary>
-    public static byte[] ReadBytes(Stream stream)
+    public static byte[] ReadBytes(CitoStream stream)
     {
         //VarInt length
         int length = (int)ReadUInt32(stream);
@@ -39,16 +39,16 @@ public static class ProtocolParser
     /// Skip the next varint length prefixed bytes.
     /// Alternative to ReadBytes when the data is not of interest.
     /// </summary>
-    public static void SkipBytes(Stream stream)
+    public static void SkipBytes(CitoStream stream)
     {
         int length = (int)ReadUInt32(stream);
-        if (stream.CanSeek)
+        if (stream.CanSeek())
             stream.Seek(length, SeekOrigin.Current);
         else
             ReadBytes(stream);
     }
 
-    public static void WriteString(Stream stream, string val)
+    public static void WriteString(CitoStream stream, string val)
     {
         WriteBytes(stream, Encoding.UTF8.GetBytes(val));
     }
@@ -56,7 +56,7 @@ public static class ProtocolParser
     /// <summary>
     /// Writes length delimited byte array
     /// </summary>
-    public static void WriteBytes(Stream stream, byte[] val)
+    public static void WriteBytes(CitoStream stream, byte[] val)
     {
         WriteUInt32(stream, (uint)val.Length);
         stream.Write(val, 0, val.Length);
@@ -200,13 +200,13 @@ public static class ProtocolParser
     //public static partial class ProtocolParser
     //{
 
-    public static Key ReadKey(Stream stream)
+    public static Key ReadKey(CitoStream stream)
     {
         uint n = ReadUInt32(stream);
         return new Key(n >> 3, (Wire)(n & 0x07));
     }
 
-    public static Key ReadKey(byte firstByte, Stream stream)
+    public static Key ReadKey(byte firstByte, CitoStream stream)
     {
         if (firstByte < 128)
             return new Key((uint)(firstByte >> 3), (Wire)(firstByte & 0x07));
@@ -214,7 +214,7 @@ public static class ProtocolParser
         return new Key(fieldID, (Wire)(firstByte & 0x07));
     }
 
-    public static void WriteKey(Stream stream, Key key)
+    public static void WriteKey(CitoStream stream, Key key)
     {
         uint n = (key.Field << 3) | ((uint)key.WireType);
         WriteUInt32(stream, n);
@@ -223,7 +223,7 @@ public static class ProtocolParser
     /// <summary>
     /// Seek past the value for the previously read key.
     /// </summary>
-    public static void SkipKey(Stream stream, Key key)
+    public static void SkipKey(CitoStream stream, Key key)
     {
         switch (key.WireType)
         {
@@ -249,7 +249,7 @@ public static class ProtocolParser
     /// Used to preserve unknown keys during deserialization.
     /// Requires the message option preserveunknown=true.
     /// </summary>
-    public static byte[] ReadValueBytes(Stream stream, Key key)
+    public static byte[] ReadValueBytes(CitoStream stream, Key key)
     {
         byte[] b;
         int offset = 0;
@@ -269,13 +269,13 @@ public static class ProtocolParser
             case Wire.LengthDelimited:
                 //Read and include length in value buffer
                 uint length = ProtocolParser.ReadUInt32(stream);
-                using (var ms = new MemoryStream())
+                CitoMemoryStream ms = new CitoMemoryStream();
                 {
                     //TODO: pass b directly to MemoryStream constructor or skip usage of it completely
                     ProtocolParser.WriteUInt32(ms, length);
-                    b = new byte[length + ms.Length];
+                    b = new byte[length + ms.Length()];
                     ms.ToArray().CopyTo(b, 0);
-                    offset = (int)ms.Length;
+                    offset = ms.Length();
                 }
 
                 //Read data into buffer
@@ -287,6 +287,11 @@ public static class ProtocolParser
             default:
                 throw new NotImplementedException("Unknown wire type: " + key.WireType);
         }
+    }
+
+    private static void WriteUInt32(CitoMemoryStream ms, uint length)
+    {
+        throw new NotImplementedException();
     }
     //}
     //}
@@ -301,7 +306,7 @@ public static class ProtocolParser
     /// <summary>
     /// Reads past a varint for an unknown field.
     /// </summary>
-    public static void ReadSkipVarInt(Stream stream)
+    public static void ReadSkipVarInt(CitoStream stream)
     {
         while (true)
         {
@@ -314,7 +319,7 @@ public static class ProtocolParser
         }
     }
 
-    public static byte[] ReadVarIntBytes(Stream stream)
+    public static byte[] ReadVarIntBytes(CitoStream stream)
     {
         byte[] buffer = new byte[10];
         int offset = 0;
@@ -340,7 +345,7 @@ public static class ProtocolParser
     /// Since the int32 format is inefficient for negative numbers we have avoided to implement it.
     /// The same functionality can be achieved using: (int)ReadUInt64(stream);
     /// </summary>
-    public static int ReadInt32(Stream stream)
+    public static int ReadInt32(CitoStream stream)
     {
         return (int)ReadUInt64(stream);
     }
@@ -351,7 +356,7 @@ public static class ProtocolParser
     /// The same functionality can be achieved using: WriteUInt64(stream, (uint)val);
     /// Note that 64 must always be used for int32 to generate the ten byte wire format.
     /// </summary>
-    public static void WriteInt32(Stream stream, int val)
+    public static void WriteInt32(CitoStream stream, int val)
     {
         //signed varint is always encoded as 64 but values!
         WriteUInt64(stream, (ulong)val);
@@ -360,7 +365,7 @@ public static class ProtocolParser
     /// <summary>
     /// Zig-zag signed VarInt format
     /// </summary>
-    public static int ReadZInt32(Stream stream)
+    public static int ReadZInt32(CitoStream stream)
     {
         uint val = ReadUInt32(stream);
         return (int)(val >> 1) ^ ((int)(val << 31) >> 31);
@@ -369,7 +374,7 @@ public static class ProtocolParser
     /// <summary>
     /// Zig-zag signed VarInt format
     /// </summary>
-    public static void WriteZInt32(Stream stream, int val)
+    public static void WriteZInt32(CitoStream stream, int val)
     {
         WriteUInt32(stream, (uint)((val << 1) ^ (val >> 31)));
     }
@@ -378,7 +383,7 @@ public static class ProtocolParser
     /// Unsigned VarInt format
     /// Do not use to read int32, use ReadUint64 for that.
     /// </summary>
-    public static uint ReadUInt32(Stream stream)
+    public static uint ReadUInt32(CitoStream stream)
     {
         int b;
         uint val = 0;
@@ -406,7 +411,7 @@ public static class ProtocolParser
     /// <summary>
     /// Unsigned VarInt format
     /// </summary>
-    public static void WriteUInt32(Stream stream, uint val)
+    public static void WriteUInt32(CitoStream stream, uint val)
     {
         byte[] buffer = new byte[5];
         int count = 0;
@@ -432,7 +437,7 @@ public static class ProtocolParser
     /// Since the int64 format is inefficient for negative numbers we have avoided to implement it.
     /// The same functionality can be achieved using: (long)ReadUInt64(stream);
     /// </summary>
-    public static int ReadInt64(Stream stream)
+    public static int ReadInt64(CitoStream stream)
     {
         return (int)ReadUInt64(stream);
     }
@@ -442,7 +447,7 @@ public static class ProtocolParser
     /// Since the int64 format is inefficient for negative numbers we have avoided to implement.
     /// The same functionality can be achieved using: WriteUInt64 (stream, (ulong)val);
     /// </summary>
-    public static void WriteInt64(Stream stream, int val)
+    public static void WriteInt64(CitoStream stream, int val)
     {
         WriteUInt64(stream, (ulong)val);
     }
@@ -450,7 +455,7 @@ public static class ProtocolParser
     /// <summary>
     /// Zig-zag signed VarInt format
     /// </summary>
-    public static int ReadZInt64(Stream stream)
+    public static int ReadZInt64(CitoStream stream)
     {
         int val = ReadUInt64(stream);
         return (val >> 1) ^ ((val << 63) >> 63);
@@ -459,7 +464,7 @@ public static class ProtocolParser
     /// <summary>
     /// Zig-zag signed VarInt format
     /// </summary>
-    public static void WriteZInt64(Stream stream, long val)
+    public static void WriteZInt64(CitoStream stream, long val)
     {
         WriteUInt64(stream, (ulong)((val << 1) ^ (val >> 63)));
     }
@@ -467,7 +472,7 @@ public static class ProtocolParser
     /// <summary>
     /// Unsigned VarInt format
     /// </summary>
-    public static int ReadUInt64(Stream stream)
+    public static int ReadUInt64(CitoStream stream)
     {
         int b;
         int val = 0;
@@ -497,7 +502,7 @@ public static class ProtocolParser
     /// <summary>
     /// Unsigned VarInt format
     /// </summary>
-    public static void WriteUInt64(Stream stream, ulong val)
+    public static void WriteUInt64(CitoStream stream, ulong val)
     {
         byte[] buffer = new byte[10];
         int count = 0;
@@ -518,7 +523,7 @@ public static class ProtocolParser
     }
     //#endregion
     //#region Varint: bool
-    public static bool ReadBool(Stream stream)
+    public static bool ReadBool(CitoStream stream)
     {
         int b = stream.ReadByte();
         if (b < 0)
@@ -530,7 +535,7 @@ public static class ProtocolParser
         throw new InvalidDataException("Invalid boolean value");
     }
 
-    public static void WriteBool(Stream stream, bool val)
+    public static void WriteBool(CitoStream stream, bool val)
     {
         stream.WriteByte(val ? (byte)1 : (byte)0);
     }
@@ -694,5 +699,62 @@ public class KeyValue
     public override string ToString()
     {
         return string.Format("[KeyValue: {0}, {1}, {2} bytes]", Key.Field, Key.WireType, Value.Length);
+    }
+}
+
+public class CitoStream
+{
+    public int Read(byte[] buffer, int read, int p)
+    {
+        return 0;
+    }
+
+    public bool CanSeek()
+    {
+        return false;
+    }
+
+    public void Seek(int length, SeekOrigin seekOrigin)
+    {
+    }
+
+    public void Write(byte[] val, int p, int p_3)
+    {
+    }
+
+    public void Seek(uint p, SeekOrigin seekOrigin)
+    {
+    }
+
+    public int ReadByte()
+    {
+        return 0;
+    }
+
+    public void WriteByte(byte p)
+    {
+    }
+
+    internal long Position()
+    {
+        return 0;
+    }
+}
+
+public class CitoMemoryStream : CitoStream
+{
+    public int Length()
+    {
+        return 0;
+    }
+
+    public byte[] ToArray()
+    {
+        return null;
+    }
+
+    public static CitoMemoryStream Create(byte[] buffer)
+    {
+        return null;
     }
 }
