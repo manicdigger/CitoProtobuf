@@ -237,7 +237,7 @@ public static class ProtocolParser
         return ret;
     }
     //#region VarInt: int32, uint32, sint32
-    [Obsolete("Use (int)ReadUInt64(stream); //yes 64")]
+    //[Obsolete("Use (int)ReadUInt64(stream); //yes 64")]
     /// <summary>
     /// Since the int32 format is inefficient for negative numbers we have avoided to implement it.
     /// The same functionality can be achieved using: (int)ReadUInt64(stream);
@@ -247,7 +247,7 @@ public static class ProtocolParser
         return ReadUInt64(stream);
     }
 
-    [Obsolete("Use WriteUInt64(stream, (ulong)val); //yes 64, negative numbers are encoded that way")]
+    //[Obsolete("Use WriteUInt64(stream, (ulong)val); //yes 64, negative numbers are encoded that way")]
     /// <summary>
     /// Since the int32 format is inefficient for negative numbers we have avoided to imlplement.
     /// The same functionality can be achieved using: WriteUInt64(stream, (uint)val);
@@ -329,7 +329,7 @@ public static class ProtocolParser
     }
     //#endregion
     //#region VarInt: int64, UInt64, SInt64
-    [Obsolete("Use (long)ReadUInt64(stream); instead")]
+    //[Obsolete("Use (long)ReadUInt64(stream); instead")]
     /// <summary>
     /// Since the int64 format is inefficient for negative numbers we have avoided to implement it.
     /// The same functionality can be achieved using: (long)ReadUInt64(stream);
@@ -339,7 +339,7 @@ public static class ProtocolParser
         return ReadUInt64(stream);
     }
 
-    [Obsolete("Use WriteUInt64 (stream, (ulong)val); instead")]
+    //[Obsolete("Use WriteUInt64 (stream, (ulong)val); instead")]
     /// <summary>
     /// Since the int64 format is inefficient for negative numbers we have avoided to implement.
     /// The same functionality can be achieved using: WriteUInt64 (stream, (ulong)val);
