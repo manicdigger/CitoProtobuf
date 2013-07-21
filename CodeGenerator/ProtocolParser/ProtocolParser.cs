@@ -5,8 +5,8 @@ using System.Text;
 // 
 //  Read/Write string and byte arrays 
 // 
-namespace SilentOrbit.ProtocolBuffers
-{
+//namespace SilentOrbit.ProtocolBuffers
+//{
     public static partial class ProtocolParser
     {   
         public static string ReadString(Stream stream)
@@ -167,5 +167,5 @@ namespace SilentOrbit.ProtocolBuffers
             }
         }
     }
-}
+//}
 

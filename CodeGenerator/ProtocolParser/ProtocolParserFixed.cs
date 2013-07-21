@@ -2,11 +2,11 @@
 //  This file contain references on how to write and read
 //  fixed integers and float/double.
 //  
-using System;
-using System.IO;
+//using System;
+//using System.IO;
 
-namespace SilentOrbit.ProtocolBuffers
-{
+//namespace SilentOrbit.ProtocolBuffers
+//{
     public static partial class ProtocolParser
     {
         #region Fixed Int, Only for reference
@@ -120,5 +120,5 @@ namespace SilentOrbit.ProtocolBuffers
         }
         #endregion
     }
-}
+//}
 

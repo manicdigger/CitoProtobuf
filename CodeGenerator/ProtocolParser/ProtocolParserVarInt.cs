@@ -1,8 +1,8 @@
-using System;
-using System.IO;
+//using System;
+//using System.IO;
 
-namespace SilentOrbit.ProtocolBuffers
-{
+//namespace SilentOrbit.ProtocolBuffers
+//{
     public static partial class ProtocolParser
     {
         /// <summary>
@@ -241,4 +241,4 @@ namespace SilentOrbit.ProtocolBuffers
         }
         #endregion
     }
-}
+//}

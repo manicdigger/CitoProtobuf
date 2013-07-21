@@ -1,11 +1,11 @@
 //
 //  Reader/Writer for field key
 //
-using System;
-using System.IO;
+//using System;
+//using System.IO;
 
-namespace SilentOrbit.ProtocolBuffers
-{
+//namespace SilentOrbit.ProtocolBuffers
+//{
     public enum Wire
     {
         Varint = 0,
@@ -151,5 +151,5 @@ namespace SilentOrbit.ProtocolBuffers
             }
         }
     }
-}
+//}
 
