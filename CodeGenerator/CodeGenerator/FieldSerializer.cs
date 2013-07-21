@@ -399,7 +399,7 @@ namespace SilentOrbit.ProtocolBuffers
                 case ProtoBuiltin.Bool:
                     return "ProtocolParser.WriteBool(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.String:
-                    return "ProtocolParser.WriteBytes(" + stream + ", Encoding.UTF8.GetBytes(" + instance + "));";
+                    return "ProtocolParser.WriteBytes(" + stream + ", ProtoPlatform.StringToBytes(" + instance + "));";
                 case ProtoBuiltin.Bytes:
                     return "ProtocolParser.WriteBytes(" + stream + ", " + instance + ");";
             }

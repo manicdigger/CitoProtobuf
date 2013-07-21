@@ -83,8 +83,6 @@ This file will be overwritten when CodeGenerator is run.");
 
                 cw.WriteLine("using System;");
                 cw.WriteLine("using System.IO;");
-                cw.WriteLine("using System.Text;");
-                cw.WriteLine("using System.Collections.Generic;");
                 cw.WriteLine();
 
                 string ns = null; //avoid writing namespace between classes if they belong to the same
