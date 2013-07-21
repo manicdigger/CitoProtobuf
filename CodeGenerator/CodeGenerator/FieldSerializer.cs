@@ -25,7 +25,7 @@ namespace SilentOrbit.ProtocolBuffers
                 {
                     //TODO: read without buffering
                     cw.Comment("repeated packed");
-                    cw.Using("var ms" + f.ID + " = new MemoryStream(global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadBytes(stream))");
+                    cw.Using("var ms" + f.ID + " = new MemoryStream(ProtocolParser.ReadBytes(stream))");
                     if (f.IsUsingBinaryWriter)
                         cw.WriteLine("BinaryReader br" + f.ID + " = new BinaryReader(ms" + f.ID + ");");
                     cw.WhileBracket("ms" + f.ID + ".Position < ms" + f.ID + ".Length");
@@ -124,7 +124,7 @@ namespace SilentOrbit.ProtocolBuffers
             }
 
             if (f.ProtoType is ProtoEnum)
-                return "(" + f.ProtoType.FullCsType + ")global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadUInt64(" + stream + ")";
+                return "(" + f.ProtoType.FullCsType + ")ProtocolParser.ReadUInt64(" + stream + ")";
             
             if (f.ProtoType is ProtoBuiltin)
             {
@@ -135,17 +135,17 @@ namespace SilentOrbit.ProtocolBuffers
                     case ProtoBuiltin.Float:
                         return binaryReader + ".ReadSingle()";
                     case ProtoBuiltin.Int32: //Wire format is 64 bit varint
-                        return "(int)global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadUInt64(" + stream + ")";
+                        return "(int)ProtocolParser.ReadUInt64(" + stream + ")";
                     case ProtoBuiltin.Int64:
-                        return "(long)global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadUInt64(" + stream + ")";
+                        return "(long)ProtocolParser.ReadUInt64(" + stream + ")";
                     case ProtoBuiltin.UInt32:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadUInt32(" + stream + ")";
+                        return "ProtocolParser.ReadUInt32(" + stream + ")";
                     case ProtoBuiltin.UInt64:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadUInt64(" + stream + ")";
+                        return "ProtocolParser.ReadUInt64(" + stream + ")";
                     case ProtoBuiltin.SInt32:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadZInt32(" + stream + ")";
+                        return "ProtocolParser.ReadZInt32(" + stream + ")";
                     case ProtoBuiltin.SInt64:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadZInt64(" + stream + ")";
+                        return "ProtocolParser.ReadZInt64(" + stream + ")";
                     case ProtoBuiltin.Fixed32:
                         return binaryReader + ".ReadUInt32()";
                     case ProtoBuiltin.Fixed64:
@@ -155,11 +155,11 @@ namespace SilentOrbit.ProtocolBuffers
                     case ProtoBuiltin.SFixed64:
                         return binaryReader + ".ReadInt64()";
                     case ProtoBuiltin.Bool:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadBool(" + stream + ")";
+                        return "ProtocolParser.ReadBool(" + stream + ")";
                     case ProtoBuiltin.String:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadString(" + stream + ")";
+                        return "ProtocolParser.ReadString(" + stream + ")";
                     case ProtoBuiltin.Bytes:
-                        return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.ReadBytes(" + stream + ")";
+                        return "ProtocolParser.ReadBytes(" + stream + ")";
                     default:
                         throw new ProtoFormatException("unknown build in: " + f.ProtoType.ProtoName, f.Source);
                 }   
@@ -240,7 +240,7 @@ namespace SilentOrbit.ProtocolBuffers
 
             //10% faster than original using GetBuffer rather than ToArray
             cw.WriteLine("uint " + memoryStream + "Length = (uint)" + memoryStream + ".Length;");
-            cw.WriteLine("global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt32(" + stream + ", " + memoryStream + "Length);");
+            cw.WriteLine("ProtocolParser.WriteUInt32(" + stream + ", " + memoryStream + "Length);");
             cw.WriteLine(stream + ".Write(" + memoryStream + ".GetBuffer(), 0, (int)" + memoryStream + "Length);");
         }
 
@@ -276,7 +276,7 @@ namespace SilentOrbit.ProtocolBuffers
                         //No memorystream buffering, write size first at once
 
                         //For constant size messages we can skip serializing to the MemoryStream
-                        cw.WriteLine("global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt32(stream, " + f.ProtoType.WireSize + "u * (uint)instance." + f.CsName + ".Count);");
+                        cw.WriteLine("ProtocolParser.WriteUInt32(stream, " + f.ProtoType.WireSize + "u * (uint)instance." + f.CsName + ".Count);");
 
                         cw.ForeachBracket("var i" + f.ID + " in instance." + f.CsName);
                         cw.WriteLine(FieldWriterType(f, "stream", "bw", "i" + f.ID));
@@ -360,7 +360,7 @@ namespace SilentOrbit.ProtocolBuffers
         {
 
             if (f.ProtoType is ProtoEnum)
-                return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
+                return "ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
 
             if (f.ProtoType is ProtoMessage)
             {
@@ -383,23 +383,23 @@ namespace SilentOrbit.ProtocolBuffers
                 case ProtoBuiltin.SFixed64:
                     return binaryWriter + ".Write(" + instance + ");";
                 case ProtoBuiltin.Int32: //Serialized as 64 bit varint
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
+                    return "ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
                 case ProtoBuiltin.Int64:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
+                    return "ProtocolParser.WriteUInt64(" + stream + ",(ulong)" + instance + ");";
                 case ProtoBuiltin.UInt32:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt32(" + stream + ", " + instance + ");";
+                    return "ProtocolParser.WriteUInt32(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.UInt64:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteUInt64(" + stream + ", " + instance + ");";
+                    return "ProtocolParser.WriteUInt64(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.SInt32:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteZInt32(" + stream + ", " + instance + ");";
+                    return "ProtocolParser.WriteZInt32(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.SInt64:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteZInt64(" + stream + ", " + instance + ");";
+                    return "ProtocolParser.WriteZInt64(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.Bool:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteBool(" + stream + ", " + instance + ");";
+                    return "ProtocolParser.WriteBool(" + stream + ", " + instance + ");";
                 case ProtoBuiltin.String:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteBytes(" + stream + ", Encoding.UTF8.GetBytes(" + instance + "));";
+                    return "ProtocolParser.WriteBytes(" + stream + ", Encoding.UTF8.GetBytes(" + instance + "));";
                 case ProtoBuiltin.Bytes:
-                    return "global::SilentOrbit.ProtocolBuffers.ProtocolParser.WriteBytes(" + stream + ", " + instance + ");";
+                    return "ProtocolParser.WriteBytes(" + stream + ", " + instance + ");";
             }
 
             throw new NotImplementedException();
