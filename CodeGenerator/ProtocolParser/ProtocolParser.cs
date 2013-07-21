@@ -7,7 +7,7 @@ using System.Text;
 // 
 //namespace SilentOrbit.ProtocolBuffers
 //{
-    public static partial class ProtocolParser
+    public static class ProtocolParser
     {   
         public static string ReadString(Stream stream)
         {
@@ -61,112 +61,7 @@ using System.Text;
             WriteUInt32(stream, (uint)val.Length);
             stream.Write(val, 0, val.Length);
         }
-    }
-
-    /// <summary>
-    /// Wrapper for streams that does not support the Position property
-    /// </summary>
-    public class StreamRead : Stream
-    {
-        Stream stream;
-
-        /// <summary>
-        /// Bytes left to read
-        /// </summary>
-        public int BytesRead { get; private set; }
-
-        /// <summary>
-        /// Define how many bytes are allowed to read
-        /// </summary>
-        /// <param name='baseStream'>
-        /// Base stream.
-        /// </param>
-        /// <param name='maxLength'>
-        /// Max length allowed to read from the stream.
-        /// </param>
-        public StreamRead(Stream baseStream)
-        {
-            this.stream = baseStream;
-        }
-
-        public override void Flush()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            int read = stream.Read(buffer, offset, count);
-            BytesRead += read;
-            return read;
-        }
-
-        public override int ReadByte()
-        {
-            int b = stream.ReadByte();
-            BytesRead += 1;
-            return b;
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void SetLength(long value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool CanSeek
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public override bool CanWrite
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public override long Length
-        {
-            get
-            {
-                return stream.Length;
-            }
-        }
-
-        public override long Position
-        {
-            get
-            {
-                return this.BytesRead;
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
+    //}
 //}
 
     //
@@ -178,8 +73,8 @@ using System.Text;
 
     //namespace SilentOrbit.ProtocolBuffers
     //{
-    public static partial class ProtocolParser
-    {
+    //public static partial class ProtocolParser
+    //{
         //#region Fixed Int, Only for reference
         /// <summary>
         /// Only for reference
@@ -290,7 +185,7 @@ using System.Text;
             writer.Write(val);
         }
         //#endregion
-    }
+    //}
     //}
 
     //
@@ -301,61 +196,9 @@ using System.Text;
 
     //namespace SilentOrbit.ProtocolBuffers
     //{
-    public enum Wire
-    {
-        Varint = 0,
-        //int32, int64, UInt32, UInt64, SInt32, SInt64, bool, enum
-        Fixed64 = 1,
-        //fixed64, sfixed64, double
-        LengthDelimited = 2,
-        //string, bytes, embedded messages, packed repeated fields
-        //Start = 3,        //  groups (deprecated)
-        //End = 4,      //  groups (deprecated)
-        Fixed32 = 5,
-        //32-bit    fixed32, SFixed32, float
-    }
 
-    public class Key
-    {
-        public uint Field { get; set; }
-
-        public Wire WireType { get; set; }
-
-        public Key(uint field, Wire wireType)
-        {
-            this.Field = field;
-            this.WireType = wireType;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[Key: {0}, {1}]", Field, WireType);
-        }
-    }
-
-    /// <summary>
-    /// Storage of unknown fields
-    /// </summary>
-    public class KeyValue
-    {
-        public Key Key { get; set; }
-
-        public byte[] Value { get; set; }
-
-        public KeyValue(Key key, byte[] value)
-        {
-            this.Key = key;
-            this.Value = value;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[KeyValue: {0}, {1}, {2} bytes]", Key.Field, Key.WireType, Value.Length);
-        }
-    }
-
-    public static partial class ProtocolParser
-    {
+    //public static partial class ProtocolParser
+    //{
 
         public static Key ReadKey(Stream stream)
         {
@@ -445,7 +288,7 @@ using System.Text;
                     throw new NotImplementedException("Unknown wire type: " + key.WireType);
             }
         }
-    }
+    //}
     //}
 
     //using System;
@@ -453,8 +296,8 @@ using System.Text;
 
     //namespace SilentOrbit.ProtocolBuffers
     //{
-    public static partial class ProtocolParser
-    {
+    //public static partial class ProtocolParser
+    //{
         /// <summary>
         /// Reads past a varint for an unknown field.
         /// </summary>
@@ -692,3 +535,162 @@ using System.Text;
         //#endregion
     }
     //}
+
+    /// <summary>
+    /// Wrapper for streams that does not support the Position property
+    /// </summary>
+    public class StreamRead : Stream
+    {
+        Stream stream;
+
+        /// <summary>
+        /// Bytes left to read
+        /// </summary>
+        public int BytesRead { get; private set; }
+
+        /// <summary>
+        /// Define how many bytes are allowed to read
+        /// </summary>
+        /// <param name='baseStream'>
+        /// Base stream.
+        /// </param>
+        /// <param name='maxLength'>
+        /// Max length allowed to read from the stream.
+        /// </param>
+        public StreamRead(Stream baseStream)
+        {
+            this.stream = baseStream;
+        }
+
+        public override void Flush()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            int read = stream.Read(buffer, offset, count);
+            BytesRead += read;
+            return read;
+        }
+
+        public override int ReadByte()
+        {
+            int b = stream.ReadByte();
+            BytesRead += 1;
+            return b;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool CanRead
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override bool CanSeek
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public override bool CanWrite
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public override long Length
+        {
+            get
+            {
+                return stream.Length;
+            }
+        }
+
+        public override long Position
+        {
+            get
+            {
+                return this.BytesRead;
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
+
+    public enum Wire
+    {
+        Varint = 0,
+        //int32, int64, UInt32, UInt64, SInt32, SInt64, bool, enum
+        Fixed64 = 1,
+        //fixed64, sfixed64, double
+        LengthDelimited = 2,
+        //string, bytes, embedded messages, packed repeated fields
+        //Start = 3,        //  groups (deprecated)
+        //End = 4,      //  groups (deprecated)
+        Fixed32 = 5,
+        //32-bit    fixed32, SFixed32, float
+    }
+
+    public class Key
+    {
+        public uint Field { get; set; }
+
+        public Wire WireType { get; set; }
+
+        public Key(uint field, Wire wireType)
+        {
+            this.Field = field;
+            this.WireType = wireType;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[Key: {0}, {1}]", Field, WireType);
+        }
+    }
+
+    /// <summary>
+    /// Storage of unknown fields
+    /// </summary>
+    public class KeyValue
+    {
+        public Key Key { get; set; }
+
+        public byte[] Value { get; set; }
+
+        public KeyValue(Key key, byte[] value)
+        {
+            this.Key = key;
+            this.Value = value;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[KeyValue: {0}, {1}, {2} bytes]", Key.Field, Key.WireType, Value.Length);
+        }
+    }
