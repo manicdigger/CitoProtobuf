@@ -205,13 +205,13 @@ namespace SilentOrbit.ProtocolBuffers
             //Write final byte
             if (bytes.Count == 1)
             {
-                cw.WriteLine(stream + ".WriteByte(" + bytes[0] + ");");
+                cw.WriteLine(stream + ".WriteByte(ProtoPlatform.IntToByte(" + bytes[0] + "));");
                 return;
             }
 
             foreach (byte v in bytes)
             {
-                cw.WriteLine(stream + ".WriteByte(" + v + ");");
+                cw.WriteLine(stream + ".WriteByte(ProtoPlatform.IntToByte(" + v + "));");
             }
             //string line = stream + ".Write(new byte[]{";
             //foreach (byte v in bytes)

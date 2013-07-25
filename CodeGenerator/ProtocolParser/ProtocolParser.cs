@@ -814,53 +814,94 @@ public class ProtoPlatform
 {
     public static byte[] StringToBytes(string s)
     {
+        byte[] b;
 #if CITO
 #if CS
         native
         {
-            byte[] b = Encoding.UTF8.GetBytes(s);
-            return b;
+            b = Encoding.UTF8.GetBytes(s);
+            
+        }
+#elif JAVA
+        native
+        {
+            try
+            {
+                b = s.getBytes("UTF-8");
+            }
+            catch (Exception e)
+            {
+                b = null;
+            }
         }
 #else
-        return null;
+        b = null;
 #endif
 #else
-        byte[] b = Encoding.UTF8.GetBytes(s);
-        return b;
+        b = Encoding.UTF8.GetBytes(s);
 
 #endif
+        return b;
     }
     public static string BytesToString(byte[] bytes, int length)
     {
+        string s;
 #if CITO
 #if CS
         native
         {
-            string s = Encoding.UTF8.GetString(bytes);
-            return s;
+            s = Encoding.UTF8.GetString(bytes);
+        }
+#elif JAVA
+        native
+        {
+            try
+            {
+                s = new String(bytes, "UTF-8");
+            }
+            catch (Exception e)
+            {
+                s = null;
+            }
         }
 #else
-        return null;
+        s = null;
 #endif
 #else
-        string s = Encoding.UTF8.GetString(bytes);
-        return s;
+        s = Encoding.UTF8.GetString(bytes);
 #endif
+        return s;
     }
 
     public static int ArrayLength(byte[] a)
     {
+        int len;
 #if CITO
 #if CS
         native
         {
-            return a.Length;
+            len = a.Length;
+        }
+#elif JAVA
+        native
+        {
+            len = a.length;
         }
 #else
-        return 0;
+        len = 0;
 #endif
 #else
-        return a.Length;
+        len = a.Length;
+#endif
+        return len;
+    }
+
+    public static byte IntToByte(int a)
+    {
+#if CITO
+        return a.LowByte;
+#else
+        return (byte)a;
 #endif
     }
 }
