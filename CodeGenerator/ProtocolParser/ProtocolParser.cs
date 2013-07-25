@@ -474,7 +474,7 @@ public class ProtocolParser
 #else
             buffer[count] = (val & 0x7F).LowByte;
 #endif
-            val = val >> 7;
+            val = ProtoPlatform.logical_right_shift(val, 7);
             if (val == 0)
                 break;
 
@@ -903,6 +903,13 @@ public class ProtoPlatform
 #else
         return (byte)a;
 #endif
+    }
+
+    //http://stackoverflow.com/a/8248336
+    public static int logical_right_shift(int x, int n)
+    {
+        int mask = ~(-1 << n) << (32 - n);
+        return ~mask & ((x >> n) | mask);
     }
 }
 
