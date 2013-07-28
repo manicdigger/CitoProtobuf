@@ -12,7 +12,7 @@ But it's not fully tested.
 
 * When targetting C, it leaks memory because "delete" is not used.
 * Messages can't be nested.
-* ProtoPlatform.StringToBytes in ProtocolParser.cs only supports C# and Java. Need to add more languages.
+* ProtoPlatform.StringToBytes and ProtoPlatform.BytesToString in ProtocolParser.cs only support C# and Java. Need to add more languages.
 
 
 # Licence, Apache License version 2.0
