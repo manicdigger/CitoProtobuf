@@ -761,6 +761,12 @@ public class CitoMemoryStream : CitoStream
 
     public override void Seek(int length, CitoSeekOrigin seekOrigin)
     {
+        switch (seekOrigin)
+        {
+            case CitoSeekOrigin.Current:
+                position_ += length;
+                break;
+        }
     }
 
     public override void Write(byte[] buffer, int offset, int count)
